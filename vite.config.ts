@@ -6,10 +6,7 @@ import { componentTagger } from "lovable-tagger";
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   // Base path for GitHub Pages
-  // Jei repository vardas NĖRA "username.github.io", nustatykite base path:
-  // Pavyzdys: jei repository vardas "korepetitorius-v1", naudokite: base: '/korepetitorius-v1/'
-  // Jei repository yra "username.github.io", palikite komentuotą arba naudokite: base: '/'
-  // base: '/',
+  base: '/ner/',
   server: {
     host: "::",
     port: 8080,
