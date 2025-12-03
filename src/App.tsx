@@ -32,7 +32,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
+      <BrowserRouter basename="/ner">
         <GitHubPagesRedirect />
         <Routes>
           <Route path="/" element={<Index />} />
