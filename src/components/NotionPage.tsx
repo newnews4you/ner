@@ -2,16 +2,16 @@ import { useState, useRef, useEffect } from "react";
 import { FileText, Heading1, Heading2, Heading3, List, CheckSquare, Quote, Code, Image, Link, Plus, GripVertical, Trash2, Edit2, Save, X } from "lucide-react";
 import useLocalStorage from "@/hooks/useLocalStorage";
 
-export type BlockType = 
-  | "paragraph" 
-  | "heading1" 
-  | "heading2" 
-  | "heading3" 
-  | "bullet-list" 
-  | "numbered-list" 
-  | "todo" 
-  | "quote" 
-  | "code" 
+export type BlockType =
+  | "paragraph"
+  | "heading1"
+  | "heading2"
+  | "heading3"
+  | "bullet-list"
+  | "numbered-list"
+  | "todo"
+  | "quote"
+  | "code"
   | "divider"
   | "callout";
 
@@ -59,7 +59,7 @@ const NotionPage = ({ pageId = "default", title: initialTitle, onSave }: NotionP
   };
 
   const updateBlock = (id: string, updates: Partial<ContentBlock>) => {
-    setBlocks(blocks.map(block => 
+    setBlocks(blocks.map(block =>
       block.id === id ? { ...block, ...updates } : block
     ));
   };
@@ -172,9 +172,8 @@ const NotionPage = ({ pageId = "default", title: initialTitle, onSave }: NotionP
           return (
             <div
               key={block.id}
-              className={`group relative flex items-start gap-2 p-2 rounded-lg transition-all ${
-                isHovered || isEditing ? "bg-secondary/30" : "hover:bg-secondary/10"
-              }`}
+              className={`group relative flex items-start gap-2 p-2 rounded-lg transition-all ${isHovered || isEditing ? "bg-secondary/30" : "hover:bg-secondary/10"
+                }`}
               onMouseEnter={() => setHoveredBlock(block.id)}
               onMouseLeave={() => setHoveredBlock(null)}
             >
@@ -204,17 +203,15 @@ const NotionPage = ({ pageId = "default", title: initialTitle, onSave }: NotionP
                         onChange={(e) => setEditingContent(e.target.value)}
                         onBlur={() => handleSaveBlock(block.id)}
                         onKeyDown={(e) => handleKeyDown(e, block, index)}
-                        className={`flex-1 bg-transparent border-none outline-none ${getBlockStyles(block.type)} ${
-                          block.checked ? "line-through text-muted-foreground" : "text-foreground"
-                        }`}
+                        className={`flex-1 bg-transparent border-none outline-none ${getBlockStyles(block.type)} ${block.checked ? "line-through text-muted-foreground" : "text-foreground"
+                          }`}
                         autoFocus
                       />
                     ) : (
                       <div
                         onClick={() => handleBlockClick(block)}
-                        className={`flex-1 cursor-text ${getBlockStyles(block.type)} ${
-                          block.checked ? "line-through text-muted-foreground" : "text-foreground"
-                        } ${!block.content ? "text-muted-foreground" : ""}`}
+                        className={`flex-1 cursor-text ${getBlockStyles(block.type)} ${block.checked ? "line-through text-muted-foreground" : "text-foreground"
+                          } ${!block.content ? "text-muted-foreground" : ""}`}
                       >
                         {block.content || "Užduotis..."}
                       </div>
@@ -236,9 +233,8 @@ const NotionPage = ({ pageId = "default", title: initialTitle, onSave }: NotionP
                 ) : (
                   <div
                     onClick={() => handleBlockClick(block)}
-                    className={`cursor-text ${getBlockStyles(block.type)} ${
-                      !block.content ? "text-muted-foreground" : "text-foreground"
-                    }`}
+                    className={`cursor-text ${getBlockStyles(block.type)} ${!block.content ? "text-muted-foreground" : "text-foreground"
+                      }`}
                   >
                     {block.content || getPlaceholder(block.type)}
                   </div>
@@ -304,10 +300,10 @@ const getPlaceholder = (type: BlockType): string => {
 };
 
 // Block Type Menu
-const BlockTypeMenu = ({ 
-  onSelect, 
-  variant = "menu" 
-}: { 
+const BlockTypeMenu = ({
+  onSelect,
+  variant = "menu"
+}: {
   onSelect: (type: BlockType) => void;
   variant?: "menu" | "button";
 }) => {

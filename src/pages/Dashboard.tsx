@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { Calculator, Monitor, Atom, BookOpen, Palette, Globe, Search, Filter, ArrowUpDown, X, TrendingUp, TrendingDown, Sparkles, Calendar, FileText, Target, Home, Brain, ClipboardList, BarChart3 } from "lucide-react";
+import { useState, useMemo, useEffect } from "react";
+import { Calculator, Monitor, Atom, BookOpen, Palette, Globe, Search, Filter, ArrowUpDown, X, TrendingUp, TrendingDown, Sparkles, Calendar, FileText, Target, Home, Brain, ClipboardList, BarChart3, Folder } from "lucide-react";
 import Header from "@/components/Header";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import SubjectCard from "@/components/SubjectCard";
@@ -20,103 +20,12 @@ import StudySchedule, { TimeBlock } from "@/components/StudySchedule";
 import DailyPlanner, { DailyTask } from "@/components/DailyPlanner";
 import HabitTracker, { Habit } from "@/components/HabitTracker";
 import NotionWorkspace from "@/components/NotionWorkspace";
+import MaterialsManager from "@/components/MaterialsManager";
 import { createNotification, Notification } from "@/utils/notificationUtils";
 import useLocalStorage from "@/hooks/useLocalStorage";
+import { api, Subject } from "@/services/api";
 
-const subjects = [
-  {
-    id: 1,
-    name: "Matematika",
-    teacher: "AI Mokytojas • Matematika",
-    progress: 72,
-    gradient: "gradient-purple-pink",
-    icon: Calculator,
-    currentTopic: "Diferencialinės lygtys",
-    nextAssessment: "2024 m. gruodžio 15 d.",
-    pastTopics: [
-      { id: 1, title: "Integralai ir jų taikymas", completed: true, duration: "45 min" },
-      { id: 2, title: "Funkcijų ribos", completed: true, duration: "38 min" },
-      { id: 3, title: "Išvestinės ir jų geometrinė prasmė", completed: true, duration: "52 min" },
-      { id: 4, title: "Trigonometrinės funkcijos", completed: false, duration: "40 min" },
-    ],
-  },
-  {
-    id: 2,
-    name: "IT Technologijos",
-    teacher: "AI Mokytojas • Informatika",
-    progress: 45,
-    gradient: "gradient-cyan-blue",
-    icon: Monitor,
-    currentTopic: "Python pagrindai",
-    nextAssessment: "2024 m. gruodžio 20 d.",
-    pastTopics: [
-      { id: 1, title: "Kintamieji ir duomenų tipai", completed: true, duration: "30 min" },
-      { id: 2, title: "Sąlygos sakiniai", completed: true, duration: "35 min" },
-      { id: 3, title: "Ciklai ir iteracijos", completed: false, duration: "42 min" },
-      { id: 4, title: "Funkcijos Python'e", completed: false, duration: "48 min" },
-    ],
-  },
-  {
-    id: 3,
-    name: "Fizika",
-    teacher: "AI Mokytojas • Fizika",
-    progress: 88,
-    gradient: "gradient-orange-red",
-    icon: Atom,
-    currentTopic: "Niutono dėsniai",
-    nextAssessment: "2024 m. gruodžio 12 d.",
-    pastTopics: [
-      { id: 1, title: "Mechaninė energija", completed: true, duration: "40 min" },
-      { id: 2, title: "Impulso tvermės dėsnis", completed: true, duration: "45 min" },
-      { id: 3, title: "Gravitacija ir laisvasis kritimas", completed: true, duration: "38 min" },
-      { id: 4, title: "Trinties jėgos", completed: true, duration: "32 min" },
-    ],
-  },
-  {
-    id: 4,
-    name: "Lietuvių kalba",
-    teacher: "AI Mokytojas • Lietuvių k.",
-    progress: 61,
-    gradient: "gradient-green-teal",
-    icon: BookOpen,
-    currentTopic: "Lietuvių literatūros klasika",
-    nextAssessment: "2024 m. gruodžio 18 d.",
-    pastTopics: [
-      { id: 1, title: "Rašytinio darbo struktūra", completed: true, duration: "35 min" },
-      { id: 2, title: "Argumentavimo būdai", completed: true, duration: "40 min" },
-      { id: 3, title: "Stilistinės priemonės", completed: false, duration: "45 min" },
-    ],
-  },
-  {
-    id: 5,
-    name: "Dailė",
-    teacher: "AI Mokytojas • Dailė",
-    progress: 34,
-    gradient: "gradient-indigo-purple",
-    icon: Palette,
-    currentTopic: "Spalvų teorija ir kompozicija",
-    nextAssessment: "2024 m. gruodžio 22 d.",
-    pastTopics: [
-      { id: 1, title: "Piešimo pagrindai", completed: true, duration: "50 min" },
-      { id: 2, title: "Perspektyvos principai", completed: false, duration: "55 min" },
-    ],
-  },
-  {
-    id: 6,
-    name: "Anglų kalba",
-    teacher: "AI Mokytojas • Anglų k.",
-    progress: 79,
-    gradient: "gradient-cyan-blue",
-    icon: Globe,
-    currentTopic: "Advanced Grammar Structures",
-    nextAssessment: "2024 m. gruodžio 14 d.",
-    pastTopics: [
-      { id: 1, title: "Present Perfect vs Past Simple", completed: true, duration: "30 min" },
-      { id: 2, title: "Conditional Sentences", completed: true, duration: "35 min" },
-      { id: 3, title: "Passive Voice", completed: true, duration: "32 min" },
-    ],
-  },
-];
+
 
 const deadlines = [
   {
@@ -156,7 +65,23 @@ const deadlines = [
 type SortOption = "name" | "progress-asc" | "progress-desc" | "deadline";
 
 const Dashboard = () => {
-  const [selectedSubject, setSelectedSubject] = useState<typeof subjects[0] | null>(null);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
+
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      try {
+        const data = await api.subjects.getAll();
+        setSubjects(data);
+      } catch (error) {
+        console.error("Failed to fetch subjects:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchSubjects();
+  }, []);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<SortOption>("progress-desc");
@@ -166,21 +91,8 @@ const Dashboard = () => {
   const [notifications, setNotifications] = useLocalStorage<Notification[]>("notifications", []);
   const [studyCompleted, setStudyCompleted] = useState(0);
   const [shouldUpdateStreak, setShouldUpdateStreak] = useState(false);
-  const [showCharts, setShowCharts] = useState(false);
-  const [showAIFeatures, setShowAIFeatures] = useState(false);
-  const [showPracticeGenerator, setShowPracticeGenerator] = useState(false);
-  const [showPlanning, setShowPlanning] = useState(false);
-  const [showNotes, setShowNotes] = useState(false);
-  const [showGoals, setShowGoals] = useState(false);
-  const [showAchievements, setShowAchievements] = useState(false);
 
-  // Mock data for new components
-  const streakData = {
-    currentStreak: 5,
-    longestStreak: 12,
-    lastStudyDate: new Date(),
-  };
-
+  // Mock data for QuickStats
   const quickStatsData = {
     todayTime: "2 val. 15 min",
     completedTasks: 7 + studyCompleted,
@@ -194,7 +106,6 @@ const Dashboard = () => {
   const handleStudyComplete = () => {
     setStudyCompleted(prev => prev + 1);
     setShouldUpdateStreak(true);
-    // Add notification
     const newNotification = createNotification(
       "success",
       "Mokymosi sesija užbaigta! 🎉",
@@ -248,7 +159,11 @@ const Dashboard = () => {
   // Prepare subjects data for planning components
   const subjectsForPlanning = subjects.map(s => ({
     name: s.name,
-    icon: s.icon,
+    icon: s.iconName === 'Calculator' ? Calculator :
+      s.iconName === 'Monitor' ? Monitor :
+        s.iconName === 'Atom' ? Atom :
+          s.iconName === 'BookOpen' ? BookOpen :
+            s.iconName === 'Palette' ? Palette : Globe,
     gradient: s.gradient,
   }));
 
@@ -289,8 +204,8 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen synthwave-bg">
       <div className="relative z-10 max-w-[1600px] mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
-        <Header 
-          onChatToggle={() => setIsChatOpen(!isChatOpen)} 
+        <Header
+          onChatToggle={() => setIsChatOpen(!isChatOpen)}
           isChatOpen={isChatOpen}
           onNotificationClick={() => setShowNotifications(true)}
         />
@@ -362,7 +277,7 @@ const Dashboard = () => {
 
                 {/* Tabs Navigation */}
                 <Tabs defaultValue="overview" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 mb-6 glass border border-white/10 p-1 h-auto">
+                  <TabsList className="grid w-full grid-cols-2 sm:grid-cols-6 mb-6 glass border border-white/10 p-1 h-auto">
                     <TabsTrigger value="overview" className="flex items-center gap-2 text-xs sm:text-sm py-2.5 sm:py-3 data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
                       <Home className="w-4 h-4" />
                       <span className="hidden sm:inline">Pagrindinis</span>
@@ -382,6 +297,11 @@ const Dashboard = () => {
                       <FileText className="w-4 h-4" />
                       <span className="hidden sm:inline">Užrašai</span>
                       <span className="sm:hidden">Užr.</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="materials" className="flex items-center gap-2 text-xs sm:text-sm py-2.5 sm:py-3 data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
+                      <Folder className="w-4 h-4" />
+                      <span className="hidden sm:inline">Medžiaga</span>
+                      <span className="sm:hidden">Medž.</span>
                     </TabsTrigger>
                     <TabsTrigger value="stats" className="flex items-center gap-2 text-xs sm:text-sm py-2.5 sm:py-3 data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
                       <BarChart3 className="w-4 h-4" />
@@ -423,10 +343,10 @@ const Dashboard = () => {
                           </div>
                         </div>
                       </button>
-                      
+
                       {showTimer && (
                         <div className="mt-3 sm:mt-4 animate-fade-in">
-                          <StudyTimer 
+                          <StudyTimer
                             onStudyComplete={handleStudyComplete}
                             onNotification={handleNotification}
                             currentSubject={selectedSubject?.name || "Bendras mokymasis"}
@@ -436,7 +356,16 @@ const Dashboard = () => {
                     </div>
 
                     {/* Deadlines Panel */}
-                    <DeadlinePanel deadlines={deadlines} />
+                    <DeadlinePanel
+                      deadlines={deadlines}
+                      onDeadlineClick={(subjectName) => {
+                        const subject = subjects.find(s => s.name === subjectName);
+                        if (subject) {
+                          setSelectedSubject(subject);
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }
+                      }}
+                    />
 
                     {/* Search and Filter Section */}
                     <div className="space-y-3">
@@ -518,7 +447,11 @@ const Dashboard = () => {
                                 teacher={subject.teacher}
                                 progress={subject.progress}
                                 gradient={subject.gradient}
-                                icon={subject.icon}
+                                icon={subject.iconName === 'Calculator' ? Calculator :
+                                  subject.iconName === 'Monitor' ? Monitor :
+                                    subject.iconName === 'Atom' ? Atom :
+                                      subject.iconName === 'BookOpen' ? BookOpen :
+                                        subject.iconName === 'Palette' ? Palette : Globe}
                                 onClick={() => setSelectedSubject(subject)}
                               />
                             </div>
@@ -541,25 +474,25 @@ const Dashboard = () => {
 
                   {/* AI Tab */}
                   <TabsContent value="ai" className="space-y-4 sm:space-y-6">
-                    <AIRecommendations 
+                    <AIRecommendations
                       currentSubject={selectedSubject?.name}
-                      weakAreas={selectedSubject?.pastTopics.filter(t => !t.completed).map(t => t.title) || []}
+                      weakAreas={selectedSubject?.pastTopics.filter(t => t.status !== 'completed').map(t => t.title) || []}
                     />
                     {selectedSubject && (
-                      <AILearningPath 
+                      <AILearningPath
                         subject={selectedSubject.name}
-                        currentLevel={selectedSubject.pastTopics.filter(t => t.completed).length}
+                        currentLevel={selectedSubject.pastTopics.filter(t => t.status === 'completed').length}
                       />
                     )}
                     {selectedSubject && (
-                      <AIPracticeGenerator 
+                      <AIPracticeGenerator
                         subject={selectedSubject.name}
                         topic={selectedSubject.currentTopic}
                         onComplete={(score, total) => {
                           const newNotification = createNotification(
                             "success",
                             "Praktikos testas baigtas! 🎯",
-                            `Jūsų rezultatas: ${score} / ${total} (${Math.round((score/total)*100)}%)`
+                            `Jūsų rezultatas: ${score} / ${total} (${Math.round((score / total) * 100)}%)`
                           );
                           setNotifications([newNotification, ...notifications]);
                         }}
@@ -576,7 +509,7 @@ const Dashboard = () => {
 
                   {/* Planning Tab */}
                   <TabsContent value="planning" className="space-y-4 sm:space-y-6">
-                    <StudySchedule 
+                    <StudySchedule
                       subjects={subjectsForPlanning}
                       onBlockComplete={handleTimeBlockComplete}
                     />
@@ -592,6 +525,11 @@ const Dashboard = () => {
                   {/* Notes Tab */}
                   <TabsContent value="notes" className="space-y-4 sm:space-y-6">
                     <NotionWorkspace subject={selectedSubject?.name} />
+                  </TabsContent>
+
+                  {/* Materials Tab */}
+                  <TabsContent value="materials" className="space-y-4 sm:space-y-6">
+                    <MaterialsManager subjects={subjects} />
                   </TabsContent>
 
                   {/* Stats Tab */}
@@ -611,10 +549,10 @@ const Dashboard = () => {
       </div>
 
       {/* Mobile/Tablet Chat Overlay */}
-      <ChatbotSidebar 
-        isMobileOverlay 
-        isOpen={isChatOpen} 
-        onClose={() => setIsChatOpen(false)} 
+      <ChatbotSidebar
+        isMobileOverlay
+        isOpen={isChatOpen}
+        onClose={() => setIsChatOpen(false)}
       />
 
       {/* Notification Center */}

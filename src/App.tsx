@@ -1,6 +1,7 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AuthProvider } from "@/contexts/AuthContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
@@ -21,15 +22,15 @@ const GitHubPagesRedirect = () => {
     // The 404.html script converts & to ~and~ in both path and query, then adds & as separator
     if (location.search.startsWith('?/')) {
       const searchContent = location.search.slice(2); // Remove '?/'
-      
+
       // Find the separator: first & that's not part of ~and~
       // The separator is a standalone & added by 404.html between path and query
       // Since all & in path and query are encoded as ~and~, any literal & is the separator
       const separatorIndex = searchContent.indexOf('&');
-      
+
       let pathPart = '';
       let queryPart = '';
-      
+
       if (separatorIndex >= 0) {
         // Split at the separator
         pathPart = searchContent.substring(0, separatorIndex);
@@ -38,10 +39,10 @@ const GitHubPagesRedirect = () => {
         // No query parameters, entire content is the path
         pathPart = searchContent;
       }
-      
+
       // Decode ~and~ to & in both parts
       const path = pathPart.replace(/~and~/g, '&');
-      
+
       // Reconstruct query string if there are query params
       let queryString = '';
       if (queryPart) {
@@ -52,7 +53,7 @@ const GitHubPagesRedirect = () => {
           queryString = '?' + queryParams.join('&');
         }
       }
-      
+
       // Navigate with proper path and query string
       navigate(path + queryString + location.hash, { replace: true });
     }
@@ -63,19 +64,21 @@ const GitHubPagesRedirect = () => {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter basename="/ner">
-        <GitHubPagesRedirect />
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter basename="/ner">
+          <GitHubPagesRedirect />
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 

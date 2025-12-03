@@ -256,15 +256,15 @@
       0deg,
       transparent 0px,
       transparent 40px,
-      hsla(320, 100%, 60%, 0.03) 40px,
-      hsla(320, 100%, 60%, 0.03) 41px
+      hsla(320, 100%, 60%, 0.08) 40px,
+      hsla(320, 100%, 60%, 0.08) 41px
     ),
     repeating-linear-gradient(
       90deg,
       transparent 0px,
       transparent 80px,
-      hsla(180, 100%, 50%, 0.02) 80px,
-      hsla(180, 100%, 50%, 0.02) 81px
+      hsla(180, 100%, 50%, 0.06) 80px,
+      hsla(180, 100%, 50%, 0.06) 81px
     );
   transform: perspective(500px) rotateX(60deg);
   transform-origin: bottom;

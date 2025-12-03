@@ -1,7 +1,26 @@
-import { Link } from "react-router-dom";
-import { Sparkles, Brain, Target, TrendingUp, Clock, BookOpen, Zap, ArrowRight, CheckCircle2, Star } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Sparkles, Brain, Target, TrendingUp, Clock, BookOpen, Zap, ArrowRight, CheckCircle2, Star, LogIn } from "lucide-react";
+import { useState } from "react";
+import LoginModal from "@/components/auth/LoginModal";
+import RegisterModal from "@/components/auth/RegisterModal";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Landing = () => {
+  const [showLogin, setShowLogin] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
+  const { isAuthenticated, user } = useAuth();
+  const navigate = useNavigate();
+
+
+
+  const handleStartClick = (e: React.MouseEvent) => {
+    if (config.authEnabled && !isAuthenticated) {
+      e.preventDefault();
+      setShowLogin(true);
+    }
+    // Otherwise let the Link work or navigate programmatically
+  };
+
   const features = [
     {
       icon: Brain,
@@ -61,12 +80,36 @@ const Landing = () => {
             </div>
             <span className="text-xl font-bold text-foreground">Mano AI</span>
           </div>
-          <Link
-            to="/dashboard"
-            className="px-4 py-2 rounded-xl gradient-purple-pink text-white font-medium hover:opacity-90 transition-all shadow-lg"
-          >
-            Pradėti
-          </Link>
+
+          <div className="flex items-center gap-4">
+            {!isAuthenticated && (
+              <button
+                onClick={() => setShowLogin(true)}
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2"
+              >
+                <LogIn className="w-4 h-4" />
+                Prisijungti
+              </button>
+            )}
+
+            {isAuthenticated ? (
+              <Link
+                to="/dashboard"
+                className="px-4 py-2 rounded-xl gradient-purple-pink text-white font-medium hover:opacity-90 transition-all shadow-lg flex items-center gap-2"
+              >
+                <span>{user?.name || 'Dashboard'}</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            ) : (
+              <Link
+                to="/dashboard"
+                onClick={handleStartClick}
+                className="px-4 py-2 rounded-xl gradient-purple-pink text-white font-medium hover:opacity-90 transition-all shadow-lg"
+              >
+                Pradėti
+              </Link>
+            )}
+          </div>
         </div>
       </nav>
 
@@ -77,20 +120,21 @@ const Landing = () => {
             <Sparkles className="w-4 h-4 text-primary animate-pulse" />
             <span className="text-sm text-primary font-medium">AI-powered mokymosi platforma</span>
           </div>
-          
+
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground mb-6">
             Mokykitės efektyviau su
             <span className="text-gradient-purple block mt-2">AI Korepetitoriumi</span>
           </h1>
-          
+
           <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-            Personalizuota mokymosi platforma, kuri padeda moksleiviams pasiekti geresnius rezultatus 
+            Personalizuota mokymosi platforma, kuri padeda moksleiviams pasiekti geresnius rezultatus
             per AI rekomendacijas, gamifikaciją ir produktyvumo įrankius.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <Link
               to="/dashboard"
+              onClick={handleStartClick}
               className="px-8 py-4 rounded-xl gradient-purple-pink text-white font-semibold hover:opacity-90 transition-all shadow-lg hover:scale-105 flex items-center gap-2 text-lg"
             >
               Pradėti nemokamai
@@ -169,7 +213,7 @@ const Landing = () => {
                   Viskas, ko reikia efektyviam mokymuisi
                 </h2>
                 <p className="text-lg text-muted-foreground mb-6">
-                  Mūsų platforma sujungia AI technologijas, gamifikaciją ir produktyvumo įrankius, 
+                  Mūsų platforma sujungia AI technologijas, gamifikaciją ir produktyvumo įrankius,
                   kad padėtų jums pasiekti geriausius rezultatus.
                 </p>
                 <div className="space-y-3">
@@ -229,6 +273,7 @@ const Landing = () => {
             </p>
             <Link
               to="/dashboard"
+              onClick={handleStartClick}
               className="inline-flex items-center gap-2 px-8 py-4 rounded-xl gradient-purple-pink text-white font-semibold hover:opacity-90 transition-all shadow-lg hover:scale-105 text-lg"
             >
               Pradėti nemokamai
@@ -255,6 +300,24 @@ const Landing = () => {
           </div>
         </div>
       </footer>
+
+      {/* Auth Modals */}
+      <LoginModal
+        isOpen={showLogin}
+        onClose={() => setShowLogin(false)}
+        onSwitchToRegister={() => {
+          setShowLogin(false);
+          setShowRegister(true);
+        }}
+      />
+      <RegisterModal
+        isOpen={showRegister}
+        onClose={() => setShowRegister(false)}
+        onSwitchToLogin={() => {
+          setShowRegister(false);
+          setShowLogin(true);
+        }}
+      />
     </div>
   );
 };

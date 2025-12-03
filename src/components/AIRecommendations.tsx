@@ -81,8 +81,8 @@ const AIRecommendations = ({ currentSubject, weakAreas, studyHistory }: AIRecomm
   };
 
   const recommendations = generateRecommendations();
-  const filtered = selectedType === "all" 
-    ? recommendations 
+  const filtered = selectedType === "all"
+    ? recommendations
     : recommendations.filter(r => r.type === selectedType);
 
   const getTypeIcon = (type: Recommendation["type"]) => {
@@ -127,7 +127,7 @@ const AIRecommendations = ({ currentSubject, weakAreas, studyHistory }: AIRecomm
       {/* Background effects */}
       <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-accent/5" />
       <div className="absolute -right-10 -top-10 w-32 h-32 rounded-full bg-primary/10 blur-3xl" />
-      
+
       <div className="relative z-10">
         {/* Header */}
         <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-5">
@@ -151,11 +151,10 @@ const AIRecommendations = ({ currentSubject, weakAreas, studyHistory }: AIRecomm
         <div className="flex flex-wrap gap-2 mb-4">
           <button
             onClick={() => setSelectedType("all")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-              selectedType === "all"
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${selectedType === "all"
                 ? "gradient-purple-pink text-white"
                 : "bg-secondary/50 text-foreground hover:bg-secondary/70"
-            }`}
+              }`}
           >
             Visi ({recommendations.length})
           </button>
@@ -166,16 +165,15 @@ const AIRecommendations = ({ currentSubject, weakAreas, studyHistory }: AIRecomm
               <button
                 key={type}
                 onClick={() => setSelectedType(type)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5 ${
-                  selectedType === type
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5 ${selectedType === type
                     ? "gradient-purple-pink text-white"
                     : "bg-secondary/50 text-foreground hover:bg-secondary/70"
-                }`}
+                  }`}
               >
                 {getTypeIcon(type)}
                 {type === "study" ? "Mokymasis" :
-                 type === "practice" ? "Praktika" :
-                 type === "review" ? "Peržiūra" : "Fokusas"} ({count})
+                  type === "practice" ? "Praktika" :
+                    type === "review" ? "Peržiūra" : "Fokusas"} ({count})
               </button>
             );
           })}
@@ -196,11 +194,10 @@ const AIRecommendations = ({ currentSubject, weakAreas, studyHistory }: AIRecomm
             filtered.map((rec) => (
               <div
                 key={rec.id}
-                className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border transition-all hover:scale-[1.02] cursor-pointer ${
-                  rec.priority === "high"
+                className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border transition-all hover:scale-[1.02] cursor-pointer ${rec.priority === "high"
                     ? "bg-secondary/50 border-orange-500/30"
                     : "bg-secondary/30 border-white/10"
-                }`}
+                  }`}
               >
                 <div className="flex items-start gap-3">
                   <div className={`w-10 h-10 rounded-xl ${getTypeColor(rec.type)} flex items-center justify-center shrink-0 shadow-lg`}>
@@ -211,13 +208,12 @@ const AIRecommendations = ({ currentSubject, weakAreas, studyHistory }: AIRecomm
                       <h4 className="text-sm font-semibold text-foreground line-clamp-1">
                         {rec.title}
                       </h4>
-                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full shrink-0 ${
-                        rec.priority === "high" ? "bg-orange-500/20 text-orange-400" :
-                        rec.priority === "medium" ? "bg-cyan-500/20 text-cyan-400" :
-                        "bg-secondary text-muted-foreground"
-                      }`}>
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full shrink-0 ${rec.priority === "high" ? "bg-orange-500/20 text-orange-400" :
+                          rec.priority === "medium" ? "bg-cyan-500/20 text-cyan-400" :
+                            "bg-secondary text-muted-foreground"
+                        }`}>
                         {rec.priority === "high" ? "Aukštas" :
-                         rec.priority === "medium" ? "Vidutinis" : "Žemas"}
+                          rec.priority === "medium" ? "Vidutinis" : "Žemas"}
                       </span>
                     </div>
                     <p className="text-xs text-muted-foreground mb-2 line-clamp-2">

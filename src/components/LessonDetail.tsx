@@ -1,24 +1,14 @@
-import { ArrowLeft, Play, CheckCircle2, Circle, Calendar, Clock, BookOpen, Sparkles, TrendingUp, Target, Timer, FileText } from "lucide-react";
-import { LucideIcon } from "lucide-react";
+import { useState } from "react";
 
-interface Topic {
-  id: number;
-  title: string;
-  completed: boolean;
-  duration: string;
-}
+import { ArrowLeft, Play, FileText, CheckCircle2, Clock, BarChart3, BookOpen, Brain, Target } from "lucide-react";
+import TopicModal from "./modals/TopicModal";
+import LessonModal from "./modals/LessonModal";
+import TestModal from "./modals/TestModal";
+import TestResultsModal from "./modals/TestResultsModal";
+import PracticeModal from "./modals/PracticeModal";
+import NotesModal from "./modals/NotesModal";
 
-interface Subject {
-  id: number;
-  name: string;
-  teacher: string;
-  gradient: string;
-  icon: LucideIcon;
-  currentTopic: string;
-  nextAssessment: string;
-  progress: number;
-  pastTopics: Topic[];
-}
+import { Subject, Topic } from "@/services/api";
 
 interface LessonDetailProps {
   subject: Subject;
@@ -26,42 +16,83 @@ interface LessonDetailProps {
 }
 
 const LessonDetail = ({ subject, onBack }: LessonDetailProps) => {
-  const Icon = subject.icon;
+  const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null);
+  const [isTopicModalOpen, setIsTopicModalOpen] = useState(false);
+  const [isLessonModalOpen, setIsLessonModalOpen] = useState(false);
+  const [isTestModalOpen, setIsTestModalOpen] = useState(false);
+  const [isTestResultsModalOpen, setIsTestResultsModalOpen] = useState(false);
+  const [isPracticeModalOpen, setIsPracticeModalOpen] = useState(false);
+  const [isNotesModalOpen, setIsNotesModalOpen] = useState(false);
+  const [currentLessonTitle, setCurrentLessonTitle] = useState("");
+  const [testResults, setTestResults] = useState({ score: 0, total: 0 });
 
-  // Mock statistics data
-  const stats = {
-    overallScore: 85,
-    lastTestResult: "9/10",
-    timeSpent: "4 val. 30 min.",
-    completedTopics: subject.pastTopics.filter(t => t.completed).length,
-    totalTopics: subject.pastTopics.length + 1,
+  const handleTopicClick = (topicData: Topic) => {
+    setSelectedTopic(topicData);
+    setIsTopicModalOpen(true);
+  };
+
+  const startLesson = (title: string) => {
+    setCurrentLessonTitle(title);
+    setIsTopicModalOpen(false);
+    setIsLessonModalOpen(true);
+  };
+
+  const startTest = (title: string) => {
+    setCurrentLessonTitle(title);
+    setIsTopicModalOpen(false);
+    setIsTestModalOpen(true);
+  };
+
+  const startPractice = (title: string) => {
+    setCurrentLessonTitle(title);
+    setIsPracticeModalOpen(true);
+  };
+
+  const openNotes = (title: string) => {
+    setCurrentLessonTitle(title);
+    setIsNotesModalOpen(true);
+  };
+
+  const handleTestComplete = (score: number, total: number) => {
+    setTestResults({ score, total });
+    setIsTestModalOpen(false);
+    setIsTestResultsModalOpen(true);
   };
 
   return (
     <div className="animate-fade-in">
       {/* Header Banner */}
-      <div className={`${subject.gradient} rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 relative overflow-hidden mb-4 sm:mb-6`}>
-        <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent" />
-        <div className="absolute -right-10 -top-10 w-32 sm:w-40 h-32 sm:h-40 rounded-full bg-white/10 blur-2xl" />
-        <div className="absolute -right-5 -bottom-5 w-24 sm:w-32 h-24 sm:h-32 rounded-full bg-white/5 blur-xl" />
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0wIDBoNDBMNDAgNDBIMHoiLz48cGF0aCBkPSJNNDAgMEgwdjQwaDQweiIgc3Ryb2tlPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMDUpIiBzdHJva2Utd2lkdGg9IjEiLz48L2c+PC9zdmc+')] opacity-30" />
-        
-        <div className="relative z-10">
-          <button
-            onClick={onBack}
-            className="flex items-center gap-1.5 sm:gap-2 text-white/80 hover:text-white transition-colors mb-4 sm:mb-6 group"
-          >
-            <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:-translate-x-1 transition-transform" />
-            <span className="text-xs sm:text-sm font-medium">Grįžti</span>
-          </button>
+      <div className={`${subject.gradient} rounded-3xl p-6 sm:p-8 mb-6 sm:mb-8 text-white relative overflow-hidden shadow-2xl`}>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-black/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2"></div>
 
-          <div className="flex items-center gap-3 sm:gap-5">
-            <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/20">
-              <Icon className="w-7 h-7 sm:w-10 sm:h-10 text-white" strokeWidth={1.5} />
-            </div>
+        <button
+          onClick={onBack}
+          className="absolute top-4 left-4 sm:top-6 sm:left-6 p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-all backdrop-blur-md group"
+        >
+          <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+        </button>
+
+        <div className="relative z-10 mt-8 sm:mt-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 sm:gap-0">
             <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-medium mb-3 border border-white/10">
+                <Brain className="w-3.5 h-3.5" />
+                <span>{subject.teacher}</span>
+              </div>
               <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-0.5 sm:mb-1">{subject.name}</h1>
-              <p className="text-white/70 text-xs sm:text-sm">{subject.teacher}</p>
+              <p className="text-white/80 text-sm sm:text-base">Pažangumas: {subject.grade}/10</p>
+            </div>
+            <div className="flex items-center gap-4 bg-black/20 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-white/10">
+              <div className="text-center">
+                <div className="text-xs text-white/60 mb-0.5">Progresas</div>
+                <div className="text-lg sm:text-xl font-bold">{subject.progress}%</div>
+              </div>
+              <div className="w-px h-8 bg-white/10"></div>
+              <div className="text-center">
+                <div className="text-xs text-white/60 mb-0.5">Liko temų</div>
+                <div className="text-lg sm:text-xl font-bold">12</div>
+              </div>
             </div>
           </div>
         </div>
@@ -70,171 +101,77 @@ const LessonDetail = ({ subject, onBack }: LessonDetailProps) => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-4 sm:space-y-6">
-          {/* Current Topic - Glowing */}
+          {/* Current Topic Section */}
           <div className="glass rounded-xl sm:rounded-2xl p-4 sm:p-6 relative overflow-hidden border-2 border-primary/50 glow-purple animate-glow">
-            <div className="absolute top-0 right-0 w-24 sm:w-32 h-24 sm:h-32 rounded-full bg-primary/20 blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-20 sm:w-24 h-20 sm:h-24 rounded-full bg-accent/10 blur-2xl" />
-            
-            <div className="relative z-10">
-              <div className="flex items-center gap-2 mb-3 sm:mb-4">
-                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-primary animate-neon" />
-                <span className="text-xs sm:text-sm font-medium text-primary">Dabartinė tema</span>
-              </div>
-
-              <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-2 sm:mb-3">
-                {subject.currentTopic}
-              </h2>
-
-              <p className="text-xs sm:text-sm text-muted-foreground mb-4 sm:mb-6">
-                Tęskite mokymąsi nuo ten, kur baigėte. Jūsų pažanga išsaugoma automatiškai.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                <button 
-                  className={`${subject.gradient} px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-white text-sm font-medium flex items-center justify-center gap-2 hover:opacity-90 transition-all shadow-lg hover:scale-105 active:scale-95`}
-                  onClick={() => {
-                    // TODO: Implement lesson continuation
-                    console.log("Tęsti mokymąsi:", subject.currentTopic);
-                  }}
-                >
-                  <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  Tęsti mokymąsi
-                </button>
-                <button 
-                  className="neon-button px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl bg-secondary/80 text-foreground text-sm font-medium flex items-center justify-center gap-2 border border-primary/30 hover:border-primary/60 transition-all hover:bg-secondary active:scale-95"
-                  onClick={() => {
-                    // TODO: Implement test generation
-                    console.log("Generuoti kontrolinį darbą:", subject.name);
-                  }}
-                >
-                  <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  Generuoti Kontrolinį Darbą
-                </button>
-              </div>
+            <div className="absolute top-0 right-0 px-3 py-1 bg-primary/20 rounded-bl-xl text-xs font-medium text-primary border-b border-l border-primary/20">
+              Dabartinė tema
             </div>
-          </div>
-
-          {/* Statistics Panel */}
-          <div className="glass rounded-xl sm:rounded-2xl p-4 sm:p-6">
-            <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl gradient-cyan-blue flex items-center justify-center shadow-lg shadow-cyan-500/30">
-                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+            <div className="flex items-start gap-4 mb-4 sm:mb-6">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl gradient-purple-pink flex items-center justify-center shrink-0 shadow-lg shadow-purple-500/20">
+                <Play className="w-6 h-6 sm:w-7 sm:h-7 text-white ml-1" />
               </div>
               <div>
-                <h3 className="text-sm sm:text-base font-semibold text-foreground">Temos Išmokimo Statistika</h3>
-                <p className="text-[10px] sm:text-xs text-muted-foreground">Jūsų mokymosi progresas</p>
+                <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-2 sm:mb-3">
+                  {subject.currentTopic}
+                </h2>
+                <div className="flex flex-wrap gap-2 sm:gap-3 text-xs sm:text-sm text-muted-foreground">
+                  <span className="flex items-center gap-1 bg-secondary/50 px-2 py-1 rounded-lg">
+                    <Clock className="w-3.5 h-3.5" />
+                    45 min
+                  </span>
+                  <span className="flex items-center gap-1 bg-secondary/50 px-2 py-1 rounded-lg">
+                    <FileText className="w-3.5 h-3.5" />
+                    Teorija + Praktika
+                  </span>
+                </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
-              {/* Overall Score */}
-              <div className="bg-secondary/50 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-white/5 hover:border-primary/30 transition-colors group">
-                <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
-                  <Target className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
-                  <span className="text-[10px] sm:text-xs text-muted-foreground">Bendras įvertis</span>
-                </div>
-                <div className="relative w-12 h-12 sm:w-16 sm:h-16 mx-auto">
-                  <svg className="w-full h-full transform -rotate-90">
-                    <circle
-                      cx="50%"
-                      cy="50%"
-                      r="40%"
-                      fill="none"
-                      stroke="hsl(var(--secondary))"
-                      strokeWidth="6"
-                    />
-                    <circle
-                      cx="50%"
-                      cy="50%"
-                      r="40%"
-                      fill="none"
-                      stroke="url(#scoreGradient)"
-                      strokeWidth="6"
-                      strokeLinecap="round"
-                      strokeDasharray={`${stats.overallScore * 1.76} 176`}
-                      className="transition-all duration-1000"
-                    />
-                    <defs>
-                      <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor="hsl(320, 100%, 60%)" />
-                        <stop offset="100%" stopColor="hsl(180, 100%, 50%)" />
-                      </linearGradient>
-                    </defs>
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-sm sm:text-lg font-bold text-foreground">{stats.overallScore}%</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Last Test Result */}
-              <div className="bg-secondary/50 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-white/5 hover:border-cyan-500/30 transition-colors group">
-                <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
-                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cyan-400" />
-                  <span className="text-[10px] sm:text-xs text-muted-foreground line-clamp-1">Pask. testo rez.</span>
-                </div>
-                <p className="text-xl sm:text-2xl font-bold text-foreground text-center mt-2 sm:mt-4">{stats.lastTestResult}</p>
-                <p className="text-[10px] sm:text-xs text-green-400 text-center mt-0.5 sm:mt-1">Puikiai!</p>
-              </div>
-
-              {/* Time Spent */}
-              <div className="bg-secondary/50 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-white/5 hover:border-orange-500/30 transition-colors group">
-                <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
-                  <Timer className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-400" />
-                  <span className="text-[10px] sm:text-xs text-muted-foreground">Laikas</span>
-                </div>
-                <p className="text-base sm:text-xl font-bold text-foreground text-center mt-2 sm:mt-4">{stats.timeSpent}</p>
-                <p className="text-[10px] sm:text-xs text-muted-foreground text-center mt-0.5 sm:mt-1">šią temą</p>
-              </div>
-
-              {/* Topics Completed */}
-              <div className="bg-secondary/50 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-white/5 hover:border-green-500/30 transition-colors group">
-                <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
-                  <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-400" />
-                  <span className="text-[10px] sm:text-xs text-muted-foreground">Užbaigtos</span>
-                </div>
-                <p className="text-xl sm:text-2xl font-bold text-foreground text-center mt-2 sm:mt-4">{stats.completedTopics}/{stats.totalTopics}</p>
-                <div className="w-full h-1 sm:h-1.5 bg-secondary rounded-full mt-1.5 sm:mt-2 overflow-hidden">
-                  <div 
-                    className="h-full gradient-green-teal rounded-full transition-all duration-500"
-                    style={{ width: `${(stats.completedTopics / stats.totalTopics) * 100}%` }}
-                  />
-                </div>
-              </div>
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+              <button
+                className={`${subject.gradient} px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-white text-sm font-medium flex items-center justify-center gap-2 hover:opacity-90 transition-all shadow-lg hover:scale-105 active:scale-95`}
+                onClick={() => startLesson(subject.currentTopic)}
+              >
+                <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                Tęsti mokymąsi
+              </button>
+              <button
+                className="neon-button px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl bg-secondary/80 text-foreground text-sm font-medium flex items-center justify-center gap-2 border border-primary/30 hover:border-primary/60 transition-all hover:bg-secondary active:scale-95"
+                onClick={() => startTest(subject.currentTopic)}
+              >
+                <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                Generuoti Kontrolinį Darbą
+              </button>
             </div>
           </div>
 
           {/* Past Topics */}
           <div className="glass rounded-xl sm:rounded-2xl p-4 sm:p-6">
-            <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-5">
-              <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
-              <h3 className="text-sm sm:text-base font-semibold text-foreground">Buvusios temos</h3>
-            </div>
-
+            <h3 className="text-base sm:text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-green-400" />
+              Įveiktos temos
+            </h3>
             <div className="space-y-1.5 sm:space-y-2">
               {subject.pastTopics.map((topic) => (
                 <div
                   key={topic.id}
                   className="flex items-center justify-between p-3 sm:p-4 rounded-lg sm:rounded-xl bg-secondary/50 hover:bg-secondary/70 transition-all cursor-pointer group border border-transparent hover:border-white/10 hover:scale-[1.02]"
-                  onClick={() => {
-                    // TODO: Navigate to topic details
-                    console.log("Atidaryti temą:", topic.title);
-                  }}
+                  onClick={() => handleTopicClick(topic)}
                 >
-                  <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-                    {topic.completed ? (
-                      <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 shrink-0 animate-pulse" />
-                    ) : (
-                      <Circle className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground shrink-0 group-hover:text-primary transition-colors" />
-                    )}
-                    <span className={`text-xs sm:text-sm truncate ${topic.completed ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"} transition-colors`}>
+                  <div className="flex items-center gap-3">
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${topic.status === 'completed' ? 'bg-green-500/20 text-green-400' : 'bg-secondary text-muted-foreground'
+                      }`}>
+                      {topic.status === 'completed' ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-2 h-2 rounded-full bg-current" />}
+                    </div>
+                    <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
                       {topic.title}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 sm:gap-3 text-[10px] sm:text-xs text-muted-foreground shrink-0">
-                    <span className="hidden sm:inline">{topic.duration}</span>
-                    <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 rotate-180 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-                  </div>
+                  {topic.score && (
+                    <span className="text-xs font-bold text-green-400 bg-green-500/10 px-2 py-1 rounded-md border border-green-500/20">
+                      {topic.score}%
+                    </span>
+                  )}
                 </div>
               ))}
             </div>
@@ -243,94 +180,111 @@ const LessonDetail = ({ subject, onBack }: LessonDetailProps) => {
 
         {/* Right Column */}
         <div className="space-y-4 sm:space-y-6">
-          {/* Progress */}
-          <div className="glass rounded-xl sm:rounded-2xl p-4 sm:p-6">
-            <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-3 sm:mb-4">Bendras progresas</h3>
-            
-            <div className="relative w-24 h-24 sm:w-32 sm:h-32 mx-auto mb-3 sm:mb-4">
-              <svg className="w-full h-full transform -rotate-90">
-                <circle
-                  cx="50%"
-                  cy="50%"
-                  r="45%"
-                  fill="none"
-                  stroke="hsl(var(--secondary))"
-                  strokeWidth="8"
-                />
-                <circle
-                  cx="50%"
-                  cy="50%"
-                  r="45%"
-                  fill="none"
-                  stroke="url(#progressGradient)"
-                  strokeWidth="8"
-                  strokeLinecap="round"
-                  strokeDasharray={`${subject.progress * 2.83} 283`}
-                  className="transition-all duration-1000"
-                />
-                <defs>
-                  <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="hsl(262, 83%, 58%)" />
-                    <stop offset="100%" stopColor="hsl(330, 81%, 60%)" />
-                  </linearGradient>
-                </defs>
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-xl sm:text-2xl font-bold text-foreground">{subject.progress}%</span>
-              </div>
-            </div>
-
-            <p className="text-center text-xs sm:text-sm text-muted-foreground">
-              {100 - subject.progress}% iki kurso pabaigos
-            </p>
-          </div>
-
           {/* Next Assessment */}
-          <div className="glass rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-orange-500/20">
-            <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl gradient-orange-red flex items-center justify-center shadow-lg shadow-orange-500/30">
-                <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+          <div className="glass rounded-xl sm:rounded-2xl p-4 sm:p-6 border-l-4 border-orange-500">
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Artimiausias atsiskaitymas</h3>
+            <div className="flex items-start gap-3 mb-4">
+              <div className="p-2 rounded-lg bg-orange-500/20 text-orange-400">
+                <Clock className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-[10px] sm:text-xs text-muted-foreground">Kitas atsiskaitymas</p>
-                <p className="text-xs sm:text-sm font-semibold text-foreground">{subject.nextAssessment}</p>
+                <div className="font-bold text-foreground text-lg">{subject.nextAssessment}</div>
+                <div className="text-sm text-orange-400 font-medium">Už 2 dienų</div>
               </div>
             </div>
-
-            <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-orange-400">
-              <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-              <span>Liko 5 dienos</span>
-            </div>
+            <button className="w-full py-2.5 rounded-lg bg-orange-500/10 text-orange-400 font-medium hover:bg-orange-500/20 transition-colors text-sm border border-orange-500/20 flex items-center justify-center gap-2">
+              <Target className="w-4 h-4" />
+              Ruoštis atsiskaitymui
+            </button>
           </div>
 
           {/* Quick Actions */}
           <div className="glass rounded-xl sm:rounded-2xl p-4 sm:p-6">
-            <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-3 sm:mb-4">Greiti veiksmai</h3>
-            <div className="space-y-1.5 sm:space-y-2">
-              <button 
-                className="w-full p-2.5 sm:p-3 rounded-lg sm:rounded-xl bg-secondary/50 hover:bg-secondary/70 text-xs sm:text-sm text-foreground text-left transition-all flex items-center gap-2 sm:gap-3 border border-transparent hover:border-primary/30 hover:scale-[1.02] active:scale-95"
-                onClick={() => {
-                  // TODO: Start practice
-                  console.log("Pradėti pratybas:", subject.name);
-                }}
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Greitieji veiksmai</h3>
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
+              <button
+                className="p-3 rounded-xl bg-secondary/50 hover:bg-secondary transition-colors text-center group border border-transparent hover:border-white/5"
+                onClick={() => openNotes(subject.currentTopic)}
               >
-                <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
-                Pradėti pratybas
+                <BookOpen className="w-5 h-5 mx-auto mb-2 text-blue-400 group-hover:scale-110 transition-transform" />
+                <span className="text-xs font-medium text-foreground">Užrašai</span>
               </button>
-              <button 
-                className="w-full p-2.5 sm:p-3 rounded-lg sm:rounded-xl bg-secondary/50 hover:bg-secondary/70 text-xs sm:text-sm text-foreground text-left transition-all flex items-center gap-2 sm:gap-3 border border-transparent hover:border-cyan-500/30 hover:scale-[1.02] active:scale-95"
-                onClick={() => {
-                  // TODO: View notes
-                  console.log("Peržiūrėti užrašus:", subject.name);
-                }}
+              <button className="p-3 rounded-xl bg-secondary/50 hover:bg-secondary transition-colors text-center group border border-transparent hover:border-white/5">
+                <Brain className="w-5 h-5 mx-auto mb-2 text-purple-400 group-hover:scale-110 transition-transform" />
+                <span className="text-xs font-medium text-foreground">AI Chat</span>
+              </button>
+              <button className="p-3 rounded-xl bg-secondary/50 hover:bg-secondary transition-colors text-center group border border-transparent hover:border-white/5">
+                <BarChart3 className="w-5 h-5 mx-auto mb-2 text-green-400 group-hover:scale-110 transition-transform" />
+                <span className="text-xs font-medium text-foreground">Statistika</span>
+              </button>
+              <button
+                className="p-3 rounded-xl bg-secondary/50 hover:bg-secondary transition-colors text-center group border border-transparent hover:border-white/5"
+                onClick={() => startPractice(subject.currentTopic)}
               >
-                <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cyan-400" />
-                Peržiūrėti užrašus
+                <Target className="w-5 h-5 mx-auto mb-2 text-red-400 group-hover:scale-110 transition-transform" />
+                <span className="text-xs font-medium text-foreground">Tikslai</span>
               </button>
             </div>
           </div>
         </div>
       </div>
+
+      <TopicModal
+        isOpen={isTopicModalOpen}
+        onClose={() => setIsTopicModalOpen(false)}
+        topic={selectedTopic}
+        onStartLesson={() => {
+          if (selectedTopic) {
+            startLesson(selectedTopic.title);
+          }
+        }}
+        onStartTest={() => {
+          if (selectedTopic) {
+            startTest(selectedTopic.title);
+          }
+        }}
+      />
+
+      <LessonModal
+        isOpen={isLessonModalOpen}
+        onClose={() => setIsLessonModalOpen(false)}
+        topicTitle={currentLessonTitle}
+      />
+
+      <TestModal
+        isOpen={isTestModalOpen}
+        onClose={() => setIsTestModalOpen(false)}
+        topicTitle={currentLessonTitle}
+        onComplete={handleTestComplete}
+      />
+
+      <TestResultsModal
+        isOpen={isTestResultsModalOpen}
+        onClose={() => setIsTestResultsModalOpen(false)}
+        score={testResults.score}
+        total={testResults.total}
+        topicTitle={currentLessonTitle}
+        onRetry={() => {
+          setIsTestResultsModalOpen(false);
+          setIsTestModalOpen(true);
+        }}
+        onContinue={() => {
+          setIsTestResultsModalOpen(false);
+          // Could navigate to next topic or close
+        }}
+      />
+
+      <PracticeModal
+        isOpen={isPracticeModalOpen}
+        onClose={() => setIsPracticeModalOpen(false)}
+        topicTitle={currentLessonTitle}
+      />
+
+      <NotesModal
+        isOpen={isNotesModalOpen}
+        onClose={() => setIsNotesModalOpen(false)}
+        topicTitle={currentLessonTitle}
+      />
     </div>
   );
 };

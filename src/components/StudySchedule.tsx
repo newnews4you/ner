@@ -56,7 +56,7 @@ const StudySchedule = ({ subjects, onBlockComplete }: StudyScheduleProps) => {
   };
 
   const handleUpdateBlock = (id: string, updates: Partial<TimeBlock>) => {
-    setTimeBlocks(timeBlocks.map(block => 
+    setTimeBlocks(timeBlocks.map(block =>
       block.id === id ? { ...block, ...updates } : block
     ));
   };
@@ -79,10 +79,10 @@ const StudySchedule = ({ subjects, onBlockComplete }: StudyScheduleProps) => {
     const startMinutes = startHour * 60 + startMin;
     const endMinutes = endHour * 60 + endMin;
     const duration = endMinutes - startMinutes;
-    
+
     const top = ((startMinutes - 420) / 60) * 100; // 420 = 7:00 in minutes
     const height = (duration / 60) * 100;
-    
+
     return { top: `${top}%`, height: `${height}%` };
   };
 
@@ -153,11 +153,10 @@ const StudySchedule = ({ subjects, onBlockComplete }: StudyScheduleProps) => {
               return (
                 <div
                   key={day.toISOString()}
-                  className={`text-center p-2 rounded-lg ${
-                    isToday
+                  className={`text-center p-2 rounded-lg ${isToday
                       ? "bg-primary/20 border-2 border-primary/50"
                       : "bg-secondary/30"
-                  }`}
+                    }`}
                 >
                   <div className="text-xs font-semibold text-foreground">
                     {format(day, "EEE", { locale: lt })}
@@ -200,17 +199,16 @@ const StudySchedule = ({ subjects, onBlockComplete }: StudyScheduleProps) => {
             {weekDays.map((day) => {
               const dayBlocks = getBlocksForDate(day);
               const dayIndex = weekDays.indexOf(day) + 1;
-              
+
               return dayBlocks.map((block) => {
                 const position = getBlockPosition(block.startTime, block.endTime);
                 const subjectColor = getSubjectColor(block.subject);
-                
+
                 return (
                   <div
                     key={block.id}
-                    className={`absolute ${subjectColor} rounded-lg p-2 text-white text-xs cursor-pointer hover:opacity-90 transition-all border-2 ${
-                      block.completed ? "border-green-400 opacity-70" : "border-white/20"
-                    }`}
+                    className={`absolute ${subjectColor} rounded-lg p-2 text-white text-xs cursor-pointer hover:opacity-90 transition-all border-2 ${block.completed ? "border-green-400 opacity-70" : "border-white/20"
+                      }`}
                     style={{
                       left: `${(dayIndex / 8) * 100}%`,
                       width: `${(1 / 8) * 100 - 0.5}%`,
@@ -255,7 +253,7 @@ const StudySchedule = ({ subjects, onBlockComplete }: StudyScheduleProps) => {
             getBlocksForDate(new Date()).map((block) => {
               const completedCount = getBlocksForDate(new Date()).filter(b => b.completed).length;
               const totalCount = getBlocksForDate(new Date()).length;
-              
+
               return (
                 <div key={block.id} className="flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2">
