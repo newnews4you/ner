@@ -5,7 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import Index from '../Index';
 
 const renderWithRouter = (component: React.ReactElement) => {
-  return render(<BrowserRouter>{component}</BrowserRouter>);
+  return render(<BrowserRouter basename="/ner">{component}</BrowserRouter>);
 };
 
 describe('Index Page', () => {

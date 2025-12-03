@@ -10,13 +10,31 @@
       // https://github.com/rafgraph/spa-github-pages
       var pathSegmentsToKeep = 1; // Number of path segments to keep (for /ner/)
       var l = window.location;
-      l.replace(
-        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-        l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
-        l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
-        (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
-        l.hash
-      );
+      
+      // Guard: Prevent infinite redirect loop
+      // If URL is already in redirected format (?/path), check if we're at base path root
+      // If not at root, redirect to root. If already at root, let React Router handle it.
+      if (l.search.startsWith('?/')) {
+        var basePath = l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/');
+        var expectedRootPath = basePath + '/';
+        var currentPath = l.pathname;
+        
+        // If we're not already at the root path, redirect to root with query params
+        // If we're already at root, the page should load and React Router will handle the query
+        if (currentPath !== expectedRootPath && currentPath !== basePath) {
+          l.replace(expectedRootPath + l.search + l.hash);
+        }
+        // If already at root, do nothing - let the page load and React Router handle routing
+      } else {
+        // Apply redirect formula for first-time 404
+        l.replace(
+          l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+          l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
+          l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+          (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+          l.hash
+        );
+      }
     </script>
   </head>
   <body>
