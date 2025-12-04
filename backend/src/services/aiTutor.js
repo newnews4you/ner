@@ -87,8 +87,9 @@ export const getTutorResponse = async (userId, message, context = {}) => {
  * Get AI recommendations based on user progress
  */
 export const getAIRecommendations = async (userId, subjectId = null) => {
+  let userProgress = null;
   try {
-    const userProgress = await getUserProgress(userId, subjectId);
+    userProgress = await getUserProgress(userId, subjectId);
     
     const prompt = `You are an AI tutor analyzing a student's learning progress. Based on the following data, provide personalized study recommendations in Lithuanian.
 
@@ -123,7 +124,20 @@ Respond ONLY with valid JSON, no additional text.`;
     });
 
     const response = completion.choices[0].message.content;
-    const parsed = JSON.parse(response);
+    
+    // Try to extract JSON from response (in case AI adds extra text)
+    let jsonStr = response.trim();
+    // Remove markdown code blocks if present
+    if (jsonStr.startsWith('```')) {
+      jsonStr = jsonStr.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    }
+    // Find JSON object in response
+    const jsonMatch = jsonStr.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      jsonStr = jsonMatch[0];
+    }
+    
+    const parsed = JSON.parse(jsonStr);
     
     return parsed.recommendations || [];
   } catch (error) {
@@ -745,7 +759,8 @@ async function saveChatMessage(userId, subjectId, message, response) {
 }
 
 function getFallbackRecommendations(userProgress) {
-  return [
+  // Handle case when userProgress is null/undefined
+  const recommendations = [
     {
       type: 'study',
       title: 'Tęskite reguliarų mokymąsi',
@@ -756,5 +771,25 @@ function getFallbackRecommendations(userProgress) {
       reason: 'Reguliarus mokymasis padeda geriau įsiminti medžiagą'
     }
   ];
+
+  // Add subject-specific recommendations if userProgress is available
+  if (userProgress && userProgress.subjects && userProgress.subjects.length > 0) {
+    const lowProgressSubjects = userProgress.subjects.filter(s => (s.progress || 0) < 50);
+    if (lowProgressSubjects.length > 0) {
+      lowProgressSubjects.slice(0, 2).forEach(subject => {
+        recommendations.push({
+          type: 'focus',
+          title: `Sutelkite dėmesį į ${subject.name}`,
+          description: `Jūsų ${subject.name} progresas yra ${subject.progress || 0}%. Rekomenduojame daugiau laiko skirti šiai temai.`,
+          subject: subject.name,
+          priority: 'high',
+          estimatedTime: '45-60 min',
+          reason: `Žemas progresas (${subject.progress || 0}%)`
+        });
+      });
+    }
+  }
+
+  return recommendations;
 }
 
