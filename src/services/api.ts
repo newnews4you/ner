@@ -55,8 +55,8 @@ const getUserId = (): string => {
     return '1';
 };
 
-// API base URL - Always use Render backend
-const API_URL = config.apiUrl || 'https://ner-nu07.onrender.com';
+// API base URL - Always use Render backend (hardcoded to ensure it works)
+const API_URL = (config?.apiUrl || import.meta.env.VITE_API_URL || 'https://ner-nu07.onrender.com');
 
 // Helper function for API calls
 const apiCall = async (endpoint: string, options: RequestInit = {}) => {
