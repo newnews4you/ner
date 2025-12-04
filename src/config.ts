@@ -1,5 +1,5 @@
 // Always use Render backend for AI features
-const isProduction = window.location.hostname.includes('github.io');
+const isProduction = typeof window !== 'undefined' && window.location.hostname.includes('github.io');
 
 const config = {
     // Always use Render backend (has valid API key)
