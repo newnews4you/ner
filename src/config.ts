@@ -1,4 +1,4 @@
-// Detect if running on GitHub Pages or locally
+// Always use Render backend for AI features
 const isProduction = window.location.hostname.includes('github.io');
 
 const config = {
