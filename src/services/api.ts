@@ -199,11 +199,11 @@ export const api = {
             }
         },
         // Subject-specific tutor chat
-        chatTutor: async (message: string, subjectName: string, topic?: string): Promise<string> => {
+        chatTutor: async (message: string, subjectName: string, topic?: string, grade?: number, subjectId?: string): Promise<string> => {
             try {
                 const data = await apiCall('/api/ai/chat', {
                     method: 'POST',
-                    body: JSON.stringify({ message, mode: 'tutor', subjectName, topic }),
+                    body: JSON.stringify({ message, mode: 'tutor', subjectName, topic, grade, subjectId }),
                 });
                 return data.response;
             } catch (error) {

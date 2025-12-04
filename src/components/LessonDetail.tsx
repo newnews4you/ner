@@ -298,6 +298,8 @@ const LessonDetail = ({ subject, onBack }: LessonDetailProps) => {
             subjectName={subject.name}
             topic={subject.currentTopic}
             gradient={subject.gradient}
+            grade={subject.grade}
+            subjectId={subject.id}
             onClose={() => setIsChatbotOpen(false)}
           />
         </div>
