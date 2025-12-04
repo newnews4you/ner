@@ -1,4 +1,4 @@
-// Always use Render backend for AI features
+// Always use Render backend for AI features (updated)
 const isProduction = window.location.hostname.includes('github.io');
 
 const config = {
