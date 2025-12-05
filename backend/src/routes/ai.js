@@ -1,5 +1,6 @@
 import express from 'express';
 import { getTutorResponse, getAIRecommendations, generatePracticeQuestions, generateLearningPath } from '../services/aiTutor.js';
+import db from '../database/db.js';
 
 const router = express.Router();
 
@@ -20,18 +21,26 @@ const getUserId = (req) => {
  */
 router.post('/chat', async (req, res) => {
   try {
-    const { message, mode, subjectName, subjectId, topic } = req.body;
+    const { message, mode, subjectName, subjectId, topic, grade } = req.body;
     const userId = getUserId(req);
 
     if (!message) {
       return res.status(400).json({ error: 'Message is required' });
     }
 
+    // Gauti klasę iš subject, jei nėra nurodyta
+    let finalGrade = grade;
+    if (!finalGrade && subjectId) {
+      const subject = await db.get('SELECT grade FROM subjects WHERE id = ?', [subjectId]);
+      finalGrade = subject?.grade;
+    }
+
     const response = await getTutorResponse(userId, message, {
       mode: mode || 'guide', // default to guide mode
       subjectName,
       subjectId,
-      topic
+      topic,
+      grade: finalGrade || 11 // Default 11 klasė
     });
 
     res.json({

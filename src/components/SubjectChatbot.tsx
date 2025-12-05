@@ -12,6 +12,8 @@ interface SubjectChatbotProps {
   subjectName: string;
   topic?: string;
   gradient: string;
+  grade?: number;
+  subjectId?: string;
   onClose?: () => void;
 }
 
@@ -49,7 +51,7 @@ const SUBJECT_CONFIG: Record<string, { emoji: string; tutorName: string; greetin
   }
 };
 
-const SubjectChatbot = ({ subjectName, topic, gradient, onClose }: SubjectChatbotProps) => {
+const SubjectChatbot = ({ subjectName, topic, gradient, grade, subjectId, onClose }: SubjectChatbotProps) => {
   const config = SUBJECT_CONFIG[subjectName] || {
     emoji: '🎓',
     tutorName: 'AI Tutorius',
@@ -94,9 +96,8 @@ const SubjectChatbot = ({ subjectName, topic, gradient, onClose }: SubjectChatbo
 
     try {
       const { api } = await import('@/services/api');
-      // Use tutor mode with subject name
-      const response = await api.ai.chatTutor(currentInput, subjectName, topic);
-
+      // Use tutor mode with subject name, topic, and grade
+      const response = await api.ai.chatTutor(currentInput, subjectName, topic, grade, subjectId);
       const botMessage: Message = {
         id: messages.length + 2,
         text: response,

@@ -26,9 +26,17 @@ export const getTutorResponse = async (userId, message, context = {}) => {
     // Get user's study history and progress
     const userProgress = await getUserProgress(userId);
     const recentMessages = await getRecentChatHistory(userId, 5);
+    
+    // Gauti klasę iš subject duomenų, jei yra subjectId
+    let grade = context.grade;
+    if (!grade && context.subjectId) {
+      const subject = await db.get('SELECT grade FROM subjects WHERE id = ?', [context.subjectId]);
+      grade = subject?.grade || 11; // Default 11 klasė
+    }
+    if (!grade) grade = 11; // Default 11 klasė
 
-    // Build system prompt for AI tutor
-    const systemPrompt = buildSystemPrompt(userProgress, context);
+    // Build system prompt for AI tutor su grade informacija
+    const systemPrompt = buildSystemPrompt(userProgress, { ...context, grade });
 
     // Build conversation history
     const messages = [
@@ -45,7 +53,10 @@ export const getTutorResponse = async (userId, message, context = {}) => {
       model: OPENROUTER_MODEL,
       messages: messages,
       temperature: 0.7,
-      max_tokens: 500,
+      max_tokens: 1500, // Padidinta iš 500 → 1500 ilgesniems atsakymams
+      top_p: 0.9,
+      frequency_penalty: 0.3,
+      presence_penalty: 0.3,
     });
 
     const response = completion.choices[0].message.content;
@@ -56,7 +67,19 @@ export const getTutorResponse = async (userId, message, context = {}) => {
     return response;
   } catch (error) {
     console.error('Error getting AI tutor response:', error);
-    throw new Error('Failed to get AI tutor response');
+    
+    // Specifinės klaidos
+    if (error.status === 401) {
+      throw new Error('API raktas neteisingas. Susisiekite su administratoriumi.');
+    } else if (error.status === 429) {
+      throw new Error('Per daug užklausų. Palaukite kelias sekundes.');
+    } else if (error.status === 500) {
+      throw new Error('Serverio klaida. Bandykite dar kartą po kelių sekundžių.');
+    } else if (error.message && error.message.includes('timeout')) {
+      throw new Error('Užklausa užtruko per ilgai. Bandykite dar kartą.');
+    }
+    
+    throw new Error('Nepavyko gauti AI atsakymo. Bandykite dar kartą.');
   }
 };
 
@@ -64,8 +87,9 @@ export const getTutorResponse = async (userId, message, context = {}) => {
  * Get AI recommendations based on user progress
  */
 export const getAIRecommendations = async (userId, subjectId = null) => {
+  let userProgress = null;
   try {
-    const userProgress = await getUserProgress(userId, subjectId);
+    userProgress = await getUserProgress(userId, subjectId);
     
     const prompt = `You are an AI tutor analyzing a student's learning progress. Based on the following data, provide personalized study recommendations in Lithuanian.
 
@@ -100,7 +124,20 @@ Respond ONLY with valid JSON, no additional text.`;
     });
 
     const response = completion.choices[0].message.content;
-    const parsed = JSON.parse(response);
+    
+    // Try to extract JSON from response (in case AI adds extra text)
+    let jsonStr = response.trim();
+    // Remove markdown code blocks if present
+    if (jsonStr.startsWith('```')) {
+      jsonStr = jsonStr.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    }
+    // Find JSON object in response
+    const jsonMatch = jsonStr.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      jsonStr = jsonMatch[0];
+    }
+    
+    const parsed = JSON.parse(jsonStr);
     
     return parsed.recommendations || [];
   } catch (error) {
@@ -199,6 +236,325 @@ Respond ONLY with valid JSON.`;
 
 // Helper functions
 
+// Oficiali Lietuvos 11 klasės fizikos mokymo programa
+// Pagal Lietuvos Respublikos švietimo ir mokslo ministro patvirtintą programą
+// Atnaujinta 2023 m. rugsėjo 1 d.
+const PHYSICS_11_GRADE_CURRICULUM = {
+  grade: 11,
+  subject: 'Fizika',
+  hoursPerYear: 36, // Valandos per metus
+  additionalModule: '1 valanda per savaitę (jei pasirenkamas fizikos modulis)',
+  curriculum: [
+    {
+      unit: 'Fizikos mokslo kalba ir pažinimo metodai',
+      topics: [
+        'Fizikos mokslo raida - svarbiausi istoriniai atradimai',
+        'Lietuvos mokslininkų indėlis fizikos moksle',
+        'Pažinimo metodai: stebėjimas, eksperimentas',
+        'Teorinis ir eksperimentinis tyrimas',
+        'Matavimai ir skaičiavimai fizikoje',
+        'SI matavimo vienetų sistema',
+        'Matavimo tikslumo įvertinimas',
+        'Absoliučių ir santykinių paklaidų skaičiavimas'
+      ]
+    },
+    {
+      unit: 'Mechanika',
+      subtopics: [
+        {
+          name: 'Kinematika',
+          topics: [
+            'Tiesiaeigis judėjimas - greitis, pagreitis',
+            'Kreivaeigis judėjimas',
+            'Judėjimo grafikai (greitis, pagreitis, kelias)',
+            'Laisvas kritimas',
+            'Horizontalus metimas',
+            'Kampinis metimas'
+          ]
+        },
+        {
+          name: 'Dinamika',
+          topics: [
+            'Jėgos ir jų poveikis kūnų judėjimui',
+            'Niutono pirmasis dėsnis (inercijos dėsnis)',
+            'Niutono antrasis dėsnis (F = ma)',
+            'Niutono trečiasis dėsnis (veikimo ir atoveikimo)',
+            'Trinties jėgos - statinė ir kinetinė trintis',
+            'Jėgų sudėtis ir skaidymas',
+            'Jėgų pusiausvyra',
+            'Judesio kiekio (impulso) tvermės dėsnis'
+          ]
+        },
+        {
+          name: 'Darbas, galia, energija',
+          topics: [
+            'Mechaninio darbo sąvoka',
+            'Mechaninio darbo skaičiavimas',
+            'Galia - apibrėžimas ir skaičiavimas',
+            'Kinetinė energija',
+            'Potencinė energija (gravitacinė)',
+            'Energijos tvermės dėsnis mechanikoje',
+            'Energijos virsmai'
+          ]
+        },
+        {
+          name: 'Mechaninių svyravimų ir bangų fizika',
+          topics: [
+            'Svyravimų tipai - laisvieji ir priverstieji',
+            'Harmoniniai svyravimai',
+            'Svyravimų charakteristikos - amplitudė, periodas, dažnis',
+            'Mechaninės bangos - skersinės ir išilginės',
+            'Bangų charakteristikos - bangos ilgis, greitis, dažnis',
+            'Garso bangos',
+            'Bangų interferencija',
+            'Bangų difrakcija'
+          ]
+        }
+      ]
+    },
+    {
+      unit: 'Molekulinė fizika ir termodinamika',
+      topics: [
+        'Molekulinė kinetinė teorija',
+        'Idealiųjų dujų modelis',
+        'Dujų būsenos lygtis (Clapeyron lygtis)',
+        'Izoprocesai:',
+        '  - Izoterminis procesas (Boyle-Mariotte dėsnis)',
+        '  - Izobarinis procesas (Gay-Lussac dėsnis)',
+        '  - Izochorinis procesas (Charles dėsnis)',
+        'Termodinaminiai procesai',
+        'Vidaus energija',
+        'Šilumos kiekis',
+        'Savitoji šiluma',
+        'Šilumos mainai',
+        'Faziniai virsmai:',
+        '  - Lydymasis ir kietėjimas',
+        '  - Garavimas ir kondensacija',
+        '  - Sublimacija',
+        'Pirmasis termodinamikos dėsnis',
+        'Antrasis termodinamikos dėsnis',
+        'Šilumos varikliai ir jų efektyvumas'
+      ]
+    },
+    {
+      unit: 'Elektromagnetizmas',
+      subtopics: [
+        {
+          name: 'Elektrostatika',
+          topics: [
+            'Elektrinis krūvis',
+            'Kulono dėsnis',
+            'Elektrinis laukas',
+            'Elektrostatinio lauko stipris',
+            'Elektrostatinio lauko potencialas',
+            'Kondensatoriai',
+            'Kondensatoriaus talpa',
+            'Kondensatoriaus energija'
+          ]
+        },
+        {
+          name: 'Nuolatinė elektros srovė',
+          topics: [
+            'Elektros srovės sąvoka',
+            'Srovės stipris',
+            'Įtampa',
+            'Omo dėsnis',
+            'Elektros varža',
+            'Varžos priklausomybė nuo temperatūros',
+            'Jungimo būdai:',
+            '  - Nuoseklusis jungimas',
+            '  - Lygiagretusis jungimas',
+            'Kirchofo taisyklės',
+            'Elektros srovės darbas',
+            'Elektros srovės galia',
+            'Joule-Lenz dėsnis'
+          ]
+        },
+        {
+          name: 'Magnetinis laukas',
+          topics: [
+            'Magnetinio lauko sąvoka',
+            'Magnetinė indukcija',
+            'Ampero jėga',
+            'Lorenco jėga',
+            'Elektromagnetinė indukcija',
+            'Faradėjaus dėsnis',
+            'Savyindukcija',
+            'Induktyvumas',
+            'Kintamoji srovė',
+            'Efektinės vertės',
+            'Transformatoriai'
+          ]
+        }
+      ]
+    },
+    {
+      unit: 'Optika',
+      topics: [
+        'Šviesos sklidimas',
+        'Šviesos atspindys',
+        'Veidrodžiai - plokščiasis ir sferinis',
+        'Šviesos lūžimas',
+        'Snellio dėsnis',
+        'Visiškas vidaus atspindys',
+        'Lęšiai - susiliejančios ir išsiskleidžiančios',
+        'Lęšių formulė',
+        'Lęšių didinimas',
+        'Optiniai prietaisai:',
+        '  - Mikroskopas',
+        '  - Teleskopas',
+        '  - Fotoaparatas',
+        'Šviesos dispersija',
+        'Spektrai',
+        'Polarizacija'
+      ]
+    },
+    {
+      unit: 'Atomo ir branduolio fizika',
+      topics: [
+        'Atomo sandara',
+        'Bohro atomo modelis',
+        'Kvantiniai skaičiai',
+        'Elektronų konfigūracija',
+        'Radioaktyvumas',
+        'Radioaktyvusis skilimas:',
+        '  - Alfa skilimas',
+        '  - Beta skilimas',
+        '  - Gama spinduliuotė',
+        'Pusėjimo trukmė',
+        'Branduolinės reakcijos',
+        'Branduolių skilimas',
+        'Branduolių sintezė',
+        'Branduolinė energetika',
+        'Branduolinės jėgos'
+      ]
+    }
+  ],
+  learningObjectives: [
+    'Mokytis taikyti fizikos dėsnius sprendžiant uždavinius',
+    'Suprasti fizikinių reiškinių priežastis ir pasekmes',
+    'Mokytis analizuoti eksperimentus ir duomenis',
+    'Taikyti matematikos žinias fizikos uždaviniuose',
+    'Suprasti fizikos dėsnių taikymą technikoje ir gamtoje',
+    'Mokytis matuoti fizikinius dydžius ir įvertinti paklaidas',
+    'Suprasti fizikos mokslo raidos svarbą',
+    'Pažinti Lietuvos mokslininkų indėlį fizikos moksle'
+  ],
+  keyFormulas: [
+    // Kinematika
+    'v = s/t (greitis)',
+    'a = Δv/Δt (pagreitis)',
+    'v = v₀ + at (greitis su pagreičiu)',
+    's = v₀t + at²/2 (kelias)',
+    'v² = v₀² + 2as',
+    // Dinamika
+    'F = ma (Niutono II dėsnis)',
+    'p = mv (impulsas)',
+    'F = Δp/Δt (jėga ir impulso pokytis)',
+    'F = μN (trinties jėga)',
+    // Energija
+    'Eₖ = mv²/2 (kinetinė energija)',
+    'Eₚ = mgh (potencinė energija)',
+    'W = Fs (darbas)',
+    'P = W/t = Fv (galia)',
+    // Termodinamika
+    'PV = nRT (idealiųjų dujų būsenos lygtis)',
+    'Q = mcΔT (šilumos kiekis)',
+    'Q = mL (fazinių virsmų šiluma)',
+    'ΔU = Q - W (I termodinamikos dėsnis)',
+    // Elektromagnetizmas
+    'F = kq₁q₂/r² (Kulono dėsnis)',
+    'E = F/q (elektrostatinio lauko stipris)',
+    'U = kq/r (potencialas)',
+    'C = Q/U (talpa)',
+    'U = RI (Omo dėsnis)',
+    'P = UI = I²R = U²/R (galia)',
+    'F = BIL (Ampero jėga)',
+    'F = qvB (Lorenco jėga)',
+    'ε = -ΔΦ/Δt (Faradėjaus dėsnis)',
+    // Optika
+    'n = c/v (lūžio rodiklis)',
+    'n₁sin(α₁) = n₂sin(α₂) (Snellio dėsnis)',
+    '1/f = 1/d + 1/d\' (lęšių formulė)',
+    'Γ = d\'/d (didinimas)',
+    // Branduolinė fizika
+    'E = hf (fotono energija)',
+    'E = mc² (Einšteino lygtis)',
+    'N = N₀(1/2)^(t/T) (radioaktyvusis skilimas)'
+  ],
+  practicalWork: [
+    'Matavimų atlikimas ir paklaidų įvertinimas',
+    'Mechaninių dėsnių eksperimentinis tyrimas',
+    'Elektros grandinių sudarymas ir tyrimas',
+    'Optinių reiškinių stebėjimas',
+    'Duomenų analizė ir grafikų sudarymas'
+  ],
+  assessment: [
+    'Teorinių žinių patikra',
+    'Uždavinių sprendimas',
+    'Eksperimentinių darbų atlikimas',
+    'Projektinė veikla'
+  ]
+};
+
+// Funkcija gauti specifinės klasės ir dalyko temų sąrašą
+function getCurriculumData(subjectName, grade) {
+  if (subjectName === 'Fizika' && grade === 11) {
+    return PHYSICS_11_GRADE_CURRICULUM;
+  }
+  // Galite pridėti kitus dalykus ir klases čia
+  return null;
+}
+
+// Funkcija formatuoti curriculum tekstą AI prompt'ui
+function formatCurriculumForPrompt(curriculumData) {
+  if (!curriculumData) return '';
+  
+  let text = `
+📚 ${curriculumData.grade} KLASĖS ${curriculumData.subject.toUpperCase()} MOKYMO PROGRAMA
+(Valandos per metus: ${curriculumData.hoursPerYear}h${curriculumData.additionalModule ? ', ' + curriculumData.additionalModule : ''})
+
+`;
+
+  curriculumData.curriculum.forEach((unit, index) => {
+    text += `\n${index + 1}. ${unit.unit}\n`;
+    
+    if (unit.subtopics) {
+      // Jei yra subtopics (pvz., Mechanika)
+      unit.subtopics.forEach((subtopic, subIndex) => {
+        text += `   ${index + 1}.${subIndex + 1} ${subtopic.name}:\n`;
+        subtopic.topics.forEach(topic => {
+          text += `      • ${topic}\n`;
+        });
+      });
+    } else if (unit.topics) {
+      // Jei tiesiogiai topics
+      unit.topics.forEach(topic => {
+        text += `   • ${topic}\n`;
+      });
+    }
+  });
+
+  text += `\n🎯 MOKYMOSI TIKSLAI:\n`;
+  curriculumData.learningObjectives.forEach(obj => {
+    text += `   • ${obj}\n`;
+  });
+
+  text += `\n📐 SVARBIAUSIOS FORMULĖS:\n`;
+  curriculumData.keyFormulas.forEach(formula => {
+    text += `   • ${formula}\n`;
+  });
+
+  if (curriculumData.practicalWork) {
+    text += `\n🔬 PRAKTINIAI DARBAI:\n`;
+    curriculumData.practicalWork.forEach(work => {
+      text += `   • ${work}\n`;
+    });
+  }
+
+  return text;
+}
+
 // Subject-specific AI personalities
 const SUBJECT_PERSONALITIES = {
   'Matematika': {
@@ -246,7 +602,7 @@ const SUBJECT_PERSONALITIES = {
 };
 
 function buildSystemPrompt(userProgress, context) {
-  const { mode, subjectName, topic } = context;
+  const { mode, subjectName, topic, grade } = context;
   
   // GUIDE MODE - Main dashboard assistant (like a receptionist)
   if (mode === 'guide') {
@@ -289,11 +645,14 @@ Pavyzdys: Jei mokinys klausia "kaip išspręsti lygtį", atsakyk: "Matematikos k
     style: 'Padedu mokytis įvairių dalykų.',
     topics: 'įvairios temos'
   };
+
+  // Gauti specifinės klasės mokymo programą
+  const curriculumData = getCurriculumData(subjectName, grade || 11);
+  const curriculumText = curriculumData ? formatCurriculumForPrompt(curriculumData) : '';
   
   return `Tu esi "${subjectConfig.name}" ${subjectConfig.emoji} - ${subjectConfig.expertise}.
 
-🎯 TAVO SPECIALIZACIJA:
-${subjectConfig.topics}
+${curriculumText}
 
 📖 DABARTINĖ TEMA: ${topic || 'Bendra'}
 
@@ -305,14 +664,17 @@ ${subjectConfig.style}
 - Silpnos sritys: ${userProgress.weakAreas?.join(', ') || 'Nėra'}
 
 📝 INSTRUKCIJOS:
-1. Tu esi EKSPERTAS šioje srityje - mokyk giliai ir išsamiai
-2. Naudok pavyzdžius ir analogijas
-3. Jei mokinys klausia apie KĄ NORS ne tavo srityje, mandagiai nukreipk atgal į dashboard
-4. Užduok klausimus patikrinti supratimą
-5. Būk kantriai ir draugiškas
-6. Jei reikia, pateik formules, kodo pavyzdžius ar diagramas
-7. Atsakyk LIETUVIŠKAI
-8. Būk išsamus - galite rašyti ilgus atsakymus kai reikia paaiškinti`;
+1. Tu esi EKSPERTAS ${grade ? grade + ' klasės' : ''} ${subjectName} srityje - mokyk giliai ir išsamiai
+2. Naudok pavyzdžius ir analogijas iš kasdienio gyvenimo
+3. Jei mokinys klausia apie konkrečią temą, nurodyk kur ji yra mokymo programoje (pvz., "Ši tema priklauso Mechanikos skyriui, Kinematikos poskyriui")
+4. Naudok tinkamas formules iš mokymo programos
+5. Užduok klausimus patikrinti supratimą
+6. Būk kantriai ir draugiškas
+7. Jei reikia, pateik formules, diagramas ir skaičiavimo pavyzdžius
+8. Atsakyk LIETUVIŠKAI
+9. Būk išsamus - galite rašyti ilgus atsakymus kai reikia paaiškinti
+10. Fokusuokis į ${grade || 11} klasės mokymo programos temas ir tikslus
+11. Jei mokinys klausia apie KĄ NORS ne tavo srityje, mandagiai nukreipk atgal į dashboard`;
 }
 
 async function getUserProgress(userId, subjectId = null) {
@@ -397,7 +759,8 @@ async function saveChatMessage(userId, subjectId, message, response) {
 }
 
 function getFallbackRecommendations(userProgress) {
-  return [
+  // Handle case when userProgress is null/undefined
+  const recommendations = [
     {
       type: 'study',
       title: 'Tęskite reguliarų mokymąsi',
@@ -408,5 +771,25 @@ function getFallbackRecommendations(userProgress) {
       reason: 'Reguliarus mokymasis padeda geriau įsiminti medžiagą'
     }
   ];
+
+  // Add subject-specific recommendations if userProgress is available
+  if (userProgress && userProgress.subjects && userProgress.subjects.length > 0) {
+    const lowProgressSubjects = userProgress.subjects.filter(s => (s.progress || 0) < 50);
+    if (lowProgressSubjects.length > 0) {
+      lowProgressSubjects.slice(0, 2).forEach(subject => {
+        recommendations.push({
+          type: 'focus',
+          title: `Sutelkite dėmesį į ${subject.name}`,
+          description: `Jūsų ${subject.name} progresas yra ${subject.progress || 0}%. Rekomenduojame daugiau laiko skirti šiai temai.`,
+          subject: subject.name,
+          priority: 'high',
+          estimatedTime: '45-60 min',
+          reason: `Žemas progresas (${subject.progress || 0}%)`
+        });
+      });
+    }
+  }
+
+  return recommendations;
 }
 
