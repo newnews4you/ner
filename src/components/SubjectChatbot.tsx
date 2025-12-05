@@ -96,7 +96,7 @@ const SubjectChatbot = ({ subjectName, topic, gradient, onClose }: SubjectChatbo
       const { api } = await import('@/services/api');
       // Use tutor mode with subject name
       const response = await api.ai.chatTutor(currentInput, subjectName, topic);
-      
+
       const botMessage: Message = {
         id: messages.length + 2,
         text: response,
@@ -128,52 +128,52 @@ const SubjectChatbot = ({ subjectName, topic, gradient, onClose }: SubjectChatbo
 
   if (isMinimized) {
     return (
-      <div 
+      <div
         onClick={() => setIsMinimized(false)}
-        className={`fixed bottom-6 right-6 z-50 ${gradient} rounded-2xl p-4 shadow-2xl cursor-pointer hover:scale-105 transition-transform flex items-center gap-3`}
+        className="fixed bottom-6 right-6 z-50 bg-white border border-gray-200 rounded-xl p-4 shadow-lg hover:shadow-xl cursor-pointer hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-3"
       >
         <span className="text-2xl">{config.emoji}</span>
         <div>
-          <p className="text-white font-semibold text-sm">{config.tutorName}</p>
-          <p className="text-white/70 text-xs">Paspausk atidaryti</p>
+          <p className="text-gray-900 font-semibold text-sm">{config.tutorName}</p>
+          <p className="text-gray-500 text-xs font-medium">Paspausk atidaryti</p>
         </div>
-        <Maximize2 className="w-5 h-5 text-white/70" />
+        <Maximize2 className="w-4 h-4 text-gray-400" />
       </div>
     );
   }
 
   return (
-    <div className="glass rounded-2xl flex flex-col h-[500px] overflow-hidden border-2 border-white/20 shadow-2xl animate-fade-in">
+    <div className="bg-white rounded-xl flex flex-col h-[500px] overflow-hidden border border-gray-200 shadow-lg">
       {/* Header */}
-      <div className={`p-4 border-b border-white/10 ${gradient}`}>
+      <div className="p-4 border-b border-gray-100 bg-white">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-md">
+            <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center border border-gray-100">
               <span className="text-xl">{config.emoji}</span>
             </div>
             <div>
-              <h2 className="text-base font-semibold text-white flex items-center gap-2">
+              <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2 tracking-tight">
                 {config.tutorName}
-                <Sparkles className="w-4 h-4 text-white/70 animate-pulse" />
+                <Sparkles className="w-3.5 h-3.5 text-purple-500" />
               </h2>
-              <p className="text-xs text-white/70">
+              <p className="text-xs text-gray-500 font-medium">
                 {topic ? `Tema: ${topic}` : `${subjectName} ekspertas`}
               </p>
             </div>
           </div>
           <div className="flex gap-2">
-            <button 
+            <button
               onClick={() => setIsMinimized(true)}
-              className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+              className="w-8 h-8 rounded-md hover:bg-gray-100 flex items-center justify-center transition-colors"
             >
-              <Minimize2 className="w-4 h-4 text-white" />
+              <Minimize2 className="w-4 h-4 text-gray-500" />
             </button>
             {onClose && (
-              <button 
+              <button
                 onClick={onClose}
-                className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                className="w-8 h-8 rounded-md hover:bg-gray-100 flex items-center justify-center transition-colors"
               >
-                <X className="w-4 h-4 text-white" />
+                <X className="w-4 h-4 text-gray-500" />
               </button>
             )}
           </div>
@@ -181,29 +181,27 @@ const SubjectChatbot = ({ subjectName, topic, gradient, onClose }: SubjectChatbo
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin bg-background/50">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin bg-white">
         {messages.map((message) => (
           <div
             key={message.id}
             className={`flex gap-2 ${message.isBot ? "" : "flex-row-reverse"}`}
           >
             <div
-              className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                message.isBot ? gradient : "gradient-purple-pink"
-              }`}
+              className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${message.isBot ? "bg-gray-100" : "bg-blue-100"
+                }`}
             >
               {message.isBot ? (
                 <span className="text-sm">{config.emoji}</span>
               ) : (
-                <User className="w-4 h-4 text-white" />
+                <User className="w-4 h-4 text-blue-600" />
               )}
             </div>
             <div
-              className={`max-w-[80%] p-3 rounded-xl text-sm ${
-                message.isBot
-                  ? "bg-secondary/70 text-foreground"
-                  : "gradient-purple-pink text-white"
-              }`}
+              className={`max-w-[80%] p-3 rounded-xl text-sm ${message.isBot
+                ? "bg-gray-100 text-gray-900"
+                : "bg-blue-600 text-white"
+                }`}
             >
               <div className="whitespace-pre-wrap">{message.text}</div>
             </div>
@@ -212,14 +210,14 @@ const SubjectChatbot = ({ subjectName, topic, gradient, onClose }: SubjectChatbo
 
         {isTyping && (
           <div className="flex gap-2">
-            <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${gradient}`}>
+            <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-gray-100`}>
               <span className="text-sm">{config.emoji}</span>
             </div>
-            <div className="bg-secondary/70 p-3 rounded-xl">
+            <div className="bg-gray-100 p-3 rounded-xl">
               <div className="flex gap-1">
-                <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
               </div>
             </div>
           </div>
@@ -228,7 +226,7 @@ const SubjectChatbot = ({ subjectName, topic, gradient, onClose }: SubjectChatbo
       </div>
 
       {/* Input */}
-      <div className="p-4 border-t border-white/10 bg-secondary/30">
+      <div className="p-4 border-t border-gray-100 bg-white">
         <div className="flex gap-2">
           <input
             type="text"
@@ -236,17 +234,17 @@ const SubjectChatbot = ({ subjectName, topic, gradient, onClose }: SubjectChatbo
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder={`Klausk ${config.tutorName}...`}
-            className="flex-1 bg-secondary/70 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all"
+            className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-300 focus:ring-2 focus:ring-gray-100 transition-all"
           />
           <button
             onClick={handleSend}
             disabled={!input.trim()}
-            className={`w-10 h-10 rounded-xl ${gradient} flex items-center justify-center hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed shadow-lg`}
+            className="w-10 h-10 rounded-lg bg-gray-900 flex items-center justify-center hover:bg-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md active:scale-95"
           >
             <Send className="w-4 h-4 text-white" />
           </button>
         </div>
-        <p className="text-xs text-muted-foreground mt-2 text-center">
+        <p className="text-[10px] text-gray-400 mt-2 text-center font-medium">
           🎓 Specializuotas {subjectName} tutorius
         </p>
       </div>
@@ -255,4 +253,3 @@ const SubjectChatbot = ({ subjectName, topic, gradient, onClose }: SubjectChatbo
 };
 
 export default SubjectChatbot;
-

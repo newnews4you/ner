@@ -32,11 +32,11 @@ const HabitTracker = ({ onHabitComplete }: HabitTrackerProps) => {
   });
 
   const COLORS = [
-    "gradient-purple-pink",
-    "gradient-cyan-blue",
-    "gradient-orange-red",
-    "gradient-green-teal",
-    "gradient-indigo-purple",
+    "bg-purple-500",
+    "bg-blue-500",
+    "bg-orange-500",
+    "bg-green-500",
+    "bg-indigo-500",
   ];
 
   const handleAddHabit = (habit: Omit<Habit, "id" | "streak" | "longestStreak" | "completedDates">) => {
@@ -97,7 +97,7 @@ const HabitTracker = ({ onHabitComplete }: HabitTrackerProps) => {
     for (const dateStr of sorted) {
       const date = new Date(dateStr);
       const expectedDate = format(currentDate, "yyyy-MM-dd");
-      
+
       if (dateStr === expectedDate) {
         streak++;
         currentDate = subDays(currentDate, 1);
@@ -124,42 +124,42 @@ const HabitTracker = ({ onHabitComplete }: HabitTrackerProps) => {
   };
 
   return (
-    <div className="glass rounded-xl sm:rounded-2xl p-4 sm:p-6 animate-fade-in">
+    <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4 sm:mb-5">
-        <div className="flex items-center gap-2 sm:gap-3">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl gradient-orange-red flex items-center justify-center shadow-lg shadow-orange-500/30">
-            <Flame className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-orange-50 flex items-center justify-center">
+            <Flame className="w-5 h-5 text-orange-600" />
           </div>
           <div>
-            <h3 className="text-sm sm:text-base font-semibold text-foreground">Įpročių sekimas</h3>
-            <p className="text-[10px] sm:text-xs text-muted-foreground">
+            <h3 className="text-base font-semibold text-gray-900 tracking-tight">Įpročių sekimas</h3>
+            <p className="text-xs text-gray-500 font-medium">
               {habits.length} {habits.length === 1 ? "įprotis" : "įpročiai"}
             </p>
           </div>
         </div>
         <button
           onClick={() => setShowAddHabit(true)}
-          className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl gradient-orange-red flex items-center justify-center hover:opacity-90 transition-all shadow-lg hover:scale-110"
+          className="w-10 h-10 rounded-lg bg-gray-900 flex items-center justify-center hover:bg-black transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-95"
         >
-          <Plus className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+          <Plus className="w-5 h-5 text-white" />
         </button>
       </div>
 
       {/* Week Navigation */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-6">
         <button
           onClick={() => setSelectedWeek(addDays(weekStart, -7))}
-          className="px-3 py-1.5 rounded-lg bg-secondary/50 hover:bg-secondary/70 text-xs text-foreground transition-colors"
+          className="px-3 py-1.5 rounded-md bg-white border border-gray-200 hover:bg-gray-50 text-xs text-gray-700 font-medium transition-all"
         >
           ← Ankstesnė
         </button>
-        <span className="text-xs font-medium text-foreground">
+        <span className="text-xs font-semibold text-gray-900">
           {format(weekStart, "d MMM", { locale: lt })} - {format(addDays(weekStart, 6), "d MMM", { locale: lt })}
         </span>
         <button
           onClick={() => setSelectedWeek(addDays(weekStart, 7))}
-          className="px-3 py-1.5 rounded-lg bg-secondary/50 hover:bg-secondary/70 text-xs text-foreground transition-colors"
+          className="px-3 py-1.5 rounded-md bg-white border border-gray-200 hover:bg-gray-50 text-xs text-gray-700 font-medium transition-all"
         >
           Sekanti →
         </button>
@@ -169,13 +169,13 @@ const HabitTracker = ({ onHabitComplete }: HabitTrackerProps) => {
       <div className="space-y-4">
         {habits.length === 0 ? (
           <div className="text-center py-8">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-secondary/50 flex items-center justify-center">
-              <Flame className="w-8 h-8 text-muted-foreground" />
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+              <Flame className="w-8 h-8 text-gray-400" />
             </div>
-            <p className="text-sm text-muted-foreground mb-2">Nėra įpročių</p>
+            <p className="text-sm text-gray-500 mb-2">Nėra įpročių</p>
             <button
               onClick={() => setShowAddHabit(true)}
-              className="text-xs text-primary hover:text-primary/80 transition-colors"
+              className="text-xs text-orange-600 hover:text-orange-700 transition-colors font-medium"
             >
               Pridėti įprotį
             </button>
@@ -188,7 +188,7 @@ const HabitTracker = ({ onHabitComplete }: HabitTrackerProps) => {
             return (
               <div
                 key={habit.id}
-                className="p-3 sm:p-4 rounded-lg sm:rounded-xl border border-white/10 bg-secondary/30"
+                className="p-3 sm:p-4 rounded-lg sm:rounded-xl border border-gray-200 bg-white shadow-sm"
               >
                 {/* Habit Header */}
                 <div className="flex items-start justify-between mb-3">
@@ -197,11 +197,11 @@ const HabitTracker = ({ onHabitComplete }: HabitTrackerProps) => {
                       <Target className="w-4 h-4 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-sm font-semibold text-foreground line-clamp-1">
+                      <h4 className="text-sm font-semibold text-gray-900 line-clamp-1">
                         {habit.name}
                       </h4>
                       {habit.description && (
-                        <p className="text-xs text-muted-foreground line-clamp-1">
+                        <p className="text-xs text-gray-500 line-clamp-1">
                           {habit.description}
                         </p>
                       )}
@@ -209,22 +209,22 @@ const HabitTracker = ({ onHabitComplete }: HabitTrackerProps) => {
                   </div>
                   <button
                     onClick={() => handleDeleteHabit(habit.id)}
-                    className="p-1 rounded hover:bg-secondary/50 transition-colors shrink-0"
+                    className="p-1 rounded hover:bg-gray-100 transition-colors shrink-0"
                   >
-                    <Trash2 className="w-4 h-4 text-muted-foreground" />
+                    <Trash2 className="w-4 h-4 text-gray-400 hover:text-red-500" />
                   </button>
                 </div>
 
                 {/* Streak Info */}
                 <div className="flex items-center gap-4 mb-3 text-xs">
                   <div className="flex items-center gap-1">
-                    <Flame className="w-3 h-3 text-orange-400" />
-                    <span className="text-foreground font-semibold">{habit.streak}</span>
-                    <span className="text-muted-foreground">dienos serija</span>
+                    <Flame className="w-3 h-3 text-orange-500" />
+                    <span className="text-gray-900 font-semibold">{habit.streak}</span>
+                    <span className="text-gray-500">dienos serija</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Target className="w-3 h-3 text-yellow-400" />
-                    <span className="text-muted-foreground">Geriausia: {habit.longestStreak}</span>
+                    <Target className="w-3 h-3 text-yellow-500" />
+                    <span className="text-gray-500">Geriausia: {habit.longestStreak}</span>
                   </div>
                 </div>
 
@@ -240,15 +240,14 @@ const HabitTracker = ({ onHabitComplete }: HabitTrackerProps) => {
                         key={day.toISOString()}
                         onClick={() => handleToggleHabit(habit.id, day)}
                         disabled={!isPast && !isToday}
-                        className={`aspect-square rounded-lg text-[10px] transition-all ${
-                          isCompleted
-                            ? `${habit.color} text-white border-2 border-white/30`
-                            : isToday
-                            ? "bg-primary/20 border-2 border-primary/50 text-foreground"
+                        className={`aspect-square rounded-lg text-[10px] transition-all ${isCompleted
+                          ? `${habit.color} text-white shadow-sm`
+                          : isToday
+                            ? "bg-blue-50 border-2 border-blue-200 text-gray-900"
                             : isPast
-                            ? "bg-secondary/50 border border-white/10 text-muted-foreground hover:bg-secondary/70"
-                            : "bg-secondary/20 border border-white/5 text-muted-foreground opacity-50 cursor-not-allowed"
-                        }`}
+                              ? "bg-gray-100 border border-gray-200 text-gray-500 hover:bg-gray-200"
+                              : "bg-gray-50 border border-gray-100 text-gray-300 cursor-not-allowed"
+                          }`}
                       >
                         {isCompleted ? (
                           <CheckCircle2 className="w-3 h-3 mx-auto" />
@@ -263,17 +262,17 @@ const HabitTracker = ({ onHabitComplete }: HabitTrackerProps) => {
 
                 {/* Week Progress */}
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-muted-foreground">
+                  <span className="text-gray-500">
                     Savaitė: {weekStats.completed} / {weekStats.total}
                   </span>
                   <div className="flex items-center gap-2">
-                    <div className="w-16 h-1.5 bg-secondary rounded-full overflow-hidden">
+                    <div className="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                       <div
                         className={`h-full ${habit.color} rounded-full transition-all`}
                         style={{ width: `${weekStats.percent}%` }}
                       />
                     </div>
-                    <span className="text-foreground font-medium">
+                    <span className="text-gray-900 font-medium">
                       {Math.round(weekStats.percent)}%
                     </span>
                   </div>
@@ -283,7 +282,7 @@ const HabitTracker = ({ onHabitComplete }: HabitTrackerProps) => {
                 {!isTodayCompleted && (
                   <button
                     onClick={() => handleToggleHabit(habit.id, new Date())}
-                    className="w-full mt-3 px-3 py-2 rounded-lg bg-secondary/50 hover:bg-secondary/70 text-xs text-foreground transition-colors flex items-center justify-center gap-2"
+                    className="w-full mt-3 px-3 py-2 rounded-lg bg-white border border-gray-200 hover:bg-gray-50 text-xs text-gray-700 font-medium transition-all flex items-center justify-center gap-2"
                   >
                     <CheckCircle2 className="w-3 h-3" />
                     Pažymėti šiandien
@@ -339,49 +338,48 @@ const AddHabitModal = ({
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50" onClick={onClose} />
+      <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50" onClick={onClose} />
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="glass rounded-2xl p-6 w-full max-w-md border-2 border-primary/30 animate-scale-in" onClick={(e) => e.stopPropagation()}>
-          <h3 className="text-lg font-semibold text-foreground mb-4">Pridėti įprotį</h3>
+        <div className="bg-white rounded-2xl p-6 w-full max-w-md border border-gray-200 shadow-xl animate-scale-in" onClick={(e) => e.stopPropagation()}>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Pridėti įprotį</h3>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="text-xs text-muted-foreground mb-1 block">Pavadinimas *</label>
+              <label className="text-xs text-gray-500 mb-1 block">Pavadinimas *</label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-3 py-2 bg-secondary/50 border border-white/10 rounded-lg text-sm text-foreground focus:outline-none focus:border-primary/50"
+                className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
                 placeholder="Pvz: Mokytis 30 min kasdien"
                 required
               />
             </div>
             <div>
-              <label className="text-xs text-muted-foreground mb-1 block">Aprašymas</label>
+              <label className="text-xs text-gray-500 mb-1 block">Aprašymas</label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full px-3 py-2 bg-secondary/50 border border-white/10 rounded-lg text-sm text-foreground focus:outline-none focus:border-primary/50"
+                className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
                 rows={2}
                 placeholder="Papildomas aprašymas..."
               />
             </div>
             <div>
-              <label className="text-xs text-muted-foreground mb-1 block">Spalva</label>
+              <label className="text-xs text-gray-500 mb-1 block">Spalva</label>
               <div className="flex gap-2">
                 {colors.map((c) => (
                   <button
                     key={c}
                     type="button"
                     onClick={() => setColor(c)}
-                    className={`w-10 h-10 rounded-lg ${c} border-2 transition-all ${
-                      color === c ? "border-white scale-110" : "border-transparent"
-                    }`}
+                    className={`w-10 h-10 rounded-lg ${c} border-2 transition-all ${color === c ? "border-white scale-110 shadow-md" : "border-transparent"
+                      }`}
                   />
                 ))}
               </div>
             </div>
             <div>
-              <label className="text-xs text-muted-foreground mb-1 block">
+              <label className="text-xs text-gray-500 mb-1 block">
                 Tikslas: {targetDays} dienos per savaitę
               </label>
               <input
@@ -390,20 +388,20 @@ const AddHabitModal = ({
                 max="7"
                 value={targetDays}
                 onChange={(e) => setTargetDays(Number(e.target.value))}
-                className="w-full"
+                className="w-full accent-orange-500"
               />
             </div>
             <div className="flex gap-2 pt-2">
               <button
                 type="submit"
-                className="flex-1 px-4 py-2 rounded-lg gradient-orange-red text-white font-medium hover:opacity-90 transition-all"
+                className="flex-1 px-4 py-2 rounded-lg bg-gray-900 text-white font-medium hover:bg-black transition-all shadow-sm hover:shadow-md active:scale-95"
               >
                 Pridėti
               </button>
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 rounded-lg bg-secondary/50 text-foreground hover:bg-secondary/70 transition-colors"
+                className="px-4 py-2 rounded-lg bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 transition-all"
               >
                 Atšaukti
               </button>
@@ -416,4 +414,3 @@ const AddHabitModal = ({
 };
 
 export default HabitTracker;
-

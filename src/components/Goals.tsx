@@ -42,11 +42,11 @@ const Goals = ({ onGoalComplete }: GoalsProps) => {
       if (goal.id === id) {
         const newCurrent = Math.min(goal.current + increment, goal.target);
         const completed = newCurrent >= goal.target;
-        
+
         if (completed && !goal.completed && onGoalComplete) {
           onGoalComplete({ ...goal, current: newCurrent, completed: true });
         }
-        
+
         return { ...goal, current: newCurrent, completed };
       }
       return goal;
@@ -58,7 +58,7 @@ const Goals = ({ onGoalComplete }: GoalsProps) => {
   };
 
   const handleToggleComplete = (id: string) => {
-    setGoals(goals.map(goal => 
+    setGoals(goals.map(goal =>
       goal.id === id ? { ...goal, completed: !goal.completed } : goal
     ));
   };
@@ -76,24 +76,24 @@ const Goals = ({ onGoalComplete }: GoalsProps) => {
   };
 
   return (
-    <div className="glass rounded-xl sm:rounded-2xl p-4 sm:p-6 animate-fade-in">
-      <div className="flex items-center justify-between mb-4 sm:mb-5">
-        <div className="flex items-center gap-2 sm:gap-3">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl gradient-green-teal flex items-center justify-center shadow-lg shadow-green-500/30">
-            <Target className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+    <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
+            <Target className="w-5 h-5 text-green-600" />
           </div>
           <div>
-            <h3 className="text-sm sm:text-base font-semibold text-foreground">Mano tikslai</h3>
-            <p className="text-[10px] sm:text-xs text-muted-foreground">
+            <h3 className="text-base font-semibold text-gray-900 tracking-tight">Mano tikslai</h3>
+            <p className="text-xs text-gray-500 font-medium">
               {activeGoals.length} aktyvūs, {completedGoals.length} užbaigti
             </p>
           </div>
         </div>
         <button
           onClick={() => setShowAddGoal(true)}
-          className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl gradient-green-teal flex items-center justify-center hover:opacity-90 transition-all shadow-lg hover:scale-110"
+          className="w-10 h-10 rounded-lg bg-gray-900 flex items-center justify-center hover:bg-black transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-95"
         >
-          <Plus className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+          <Plus className="w-5 h-5 text-white" />
         </button>
       </div>
 
@@ -108,11 +108,10 @@ const Goals = ({ onGoalComplete }: GoalsProps) => {
             return (
               <div
                 key={goal.id}
-                className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border transition-all ${
-                  isUrgent
+                className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border transition-all ${isUrgent
                     ? "bg-secondary/50 border-orange-500/30"
                     : "bg-secondary/30 border-white/10"
-                }`}
+                  }`}
               >
                 <div className="flex items-start justify-between gap-3 mb-2">
                   <div className="flex-1 min-w-0">
@@ -120,13 +119,12 @@ const Goals = ({ onGoalComplete }: GoalsProps) => {
                       <h4 className="text-sm font-semibold text-foreground line-clamp-1">
                         {goal.title}
                       </h4>
-                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
-                        goal.category === "daily" ? "bg-cyan-500/20 text-cyan-400" :
-                        goal.category === "weekly" ? "bg-purple-500/20 text-purple-400" :
-                        "bg-orange-500/20 text-orange-400"
-                      }`}>
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${goal.category === "daily" ? "bg-cyan-500/20 text-cyan-400" :
+                          goal.category === "weekly" ? "bg-purple-500/20 text-purple-400" :
+                            "bg-orange-500/20 text-orange-400"
+                        }`}>
                         {goal.category === "daily" ? "Dieninis" :
-                         goal.category === "weekly" ? "Savaitinis" : "Mėnesinis"}
+                          goal.category === "weekly" ? "Savaitinis" : "Mėnesinis"}
                       </span>
                     </div>
                     <p className="text-xs text-muted-foreground mb-2 line-clamp-1">
@@ -136,21 +134,19 @@ const Goals = ({ onGoalComplete }: GoalsProps) => {
                       <span>
                         {goal.current} / {goal.target} {goal.unit}
                       </span>
-                      <span className={`flex items-center gap-1 ${
-                        isUrgent ? "text-orange-400" : ""
-                      }`}>
+                      <span className={`flex items-center gap-1 ${isUrgent ? "text-orange-400" : ""
+                        }`}>
                         <Calendar className="w-3 h-3" />
                         {daysLeft < 0 ? "Praėjo" : daysLeft === 0 ? "Šiandien" : `Liko ${daysLeft} d.`}
                       </span>
                     </div>
                     <div className="h-2 bg-secondary rounded-full overflow-hidden mb-2">
                       <div
-                        className={`h-full rounded-full transition-all duration-500 ${
-                          progress >= 100 ? "gradient-green-teal" :
-                          progress >= 75 ? "gradient-cyan-blue" :
-                          progress >= 50 ? "gradient-purple-pink" :
-                          "gradient-orange-red"
-                        }`}
+                        className={`h-full rounded-full transition-all duration-500 ${progress >= 100 ? "gradient-green-teal" :
+                            progress >= 75 ? "gradient-cyan-blue" :
+                              progress >= 50 ? "gradient-purple-pink" :
+                                "gradient-orange-red"
+                          }`}
                         style={{ width: `${progress}%` }}
                       />
                     </div>
@@ -336,14 +332,14 @@ const AddGoalModal = ({ onAdd, onClose }: { onAdd: (goal: Omit<Goal, "id" | "com
             <div className="flex gap-2 pt-2">
               <button
                 type="submit"
-                className="flex-1 px-4 py-2 rounded-lg gradient-green-teal text-white font-medium hover:opacity-90 transition-all"
+                className="flex-1 px-4 py-2 rounded-lg bg-gray-900 text-white font-medium hover:bg-black transition-all shadow-sm hover:shadow-md active:scale-95"
               >
                 Pridėti
               </button>
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 rounded-lg bg-secondary/50 text-foreground hover:bg-secondary/70 transition-colors"
+                className="px-4 py-2 rounded-lg bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 transition-all"
               >
                 Atšaukti
               </button>

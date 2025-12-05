@@ -35,25 +35,25 @@ const LoginModal = ({ isOpen, onClose, onSwitchToRegister }: LoginModalProps) =>
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-            <div className="relative w-full max-w-md p-6 overflow-hidden glass rounded-2xl border border-white/10 shadow-2xl animate-scale-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/20 backdrop-blur-sm animate-fade-in">
+            <div className="relative w-full max-w-md p-6 overflow-hidden bg-white rounded-2xl border border-gray-200 shadow-xl animate-scale-in">
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 p-1 rounded-full hover:bg-white/10 transition-colors"
+                    className="absolute top-4 right-4 p-1 rounded-full hover:bg-gray-100 transition-colors"
                 >
-                    <X className="w-5 h-5 text-muted-foreground" />
+                    <X className="w-5 h-5 text-gray-500" />
                 </button>
 
                 <div className="text-center mb-8">
-                    <h2 className="text-2xl font-bold text-foreground mb-2">Sveiki sugrįžę! 👋</h2>
-                    <p className="text-sm text-muted-foreground">Prisijunkite prie savo AI mokymosi erdvės</p>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Sveiki sugrįžę! 👋</h2>
+                    <p className="text-sm text-gray-500">Prisijunkite prie savo AI mokymosi erdvės</p>
                 </div>
 
                 <div className="space-y-4">
                     <button
                         onClick={handleGoogleLogin}
                         disabled={isLoading}
-                        className="w-full flex items-center justify-center gap-3 p-3 rounded-xl bg-white text-black font-medium hover:bg-gray-100 transition-colors disabled:opacity-50"
+                        className="w-full flex items-center justify-center gap-3 p-3 rounded-xl bg-white border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:opacity-50 shadow-sm"
                     >
                         {isLoading ? (
                             <Loader2 className="w-5 h-5 animate-spin" />
@@ -82,21 +82,21 @@ const LoginModal = ({ isOpen, onClose, onSwitchToRegister }: LoginModalProps) =>
 
                     <div className="relative flex items-center justify-center my-6">
                         <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-white/10"></div>
+                            <div className="w-full border-t border-gray-200"></div>
                         </div>
-                        <span className="relative px-4 text-xs text-muted-foreground bg-[#0f0f16]">arba</span>
+                        <span className="relative px-4 text-xs text-gray-500 bg-white">arba</span>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="space-y-2">
-                            <label className="text-xs font-medium text-muted-foreground ml-1">El. paštas</label>
+                            <label className="text-xs font-medium text-gray-500 ml-1">El. paštas</label>
                             <div className="relative">
-                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                                 <input
                                     type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-3 bg-secondary/50 border border-white/10 rounded-xl text-sm text-foreground focus:outline-none focus:border-primary/50 transition-colors"
+                                    className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
                                     placeholder="vardas@pavyzdys.lt"
                                     required
                                 />
@@ -104,14 +104,14 @@ const LoginModal = ({ isOpen, onClose, onSwitchToRegister }: LoginModalProps) =>
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-xs font-medium text-muted-foreground ml-1">Slaptažodis</label>
+                            <label className="text-xs font-medium text-gray-500 ml-1">Slaptažodis</label>
                             <div className="relative">
-                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                                 <input
                                     type="password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-3 bg-secondary/50 border border-white/10 rounded-xl text-sm text-foreground focus:outline-none focus:border-primary/50 transition-colors"
+                                    className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
                                     placeholder="••••••••"
                                     required
                                 />
@@ -119,11 +119,11 @@ const LoginModal = ({ isOpen, onClose, onSwitchToRegister }: LoginModalProps) =>
                         </div>
 
                         <div className="flex items-center justify-between text-xs">
-                            <label className="flex items-center gap-2 cursor-pointer text-muted-foreground hover:text-foreground transition-colors">
-                                <input type="checkbox" className="rounded border-white/20 bg-secondary/50 text-primary focus:ring-primary/50" />
+                            <label className="flex items-center gap-2 cursor-pointer text-gray-600 hover:text-gray-900 transition-colors">
+                                <input type="checkbox" className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
                                 Prisiminti mane
                             </label>
-                            <button type="button" className="text-primary hover:text-primary/80 transition-colors">
+                            <button type="button" className="text-blue-600 hover:text-blue-700 transition-colors">
                                 Pamiršote slaptažodį?
                             </button>
                         </div>
@@ -131,18 +131,18 @@ const LoginModal = ({ isOpen, onClose, onSwitchToRegister }: LoginModalProps) =>
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full py-3 rounded-xl gradient-purple-pink text-white font-medium hover:opacity-90 transition-all shadow-lg shadow-primary/25 disabled:opacity-50 flex items-center justify-center gap-2"
+                            className="w-full py-3 rounded-lg bg-gray-900 text-white font-medium hover:bg-black transition-all shadow-sm hover:shadow-md disabled:opacity-50 flex items-center justify-center gap-2 active:scale-95"
                         >
                             {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
                             Prisijungti
                         </button>
                     </form>
 
-                    <p className="text-center text-xs text-muted-foreground mt-6">
+                    <p className="text-center text-xs text-gray-500 mt-6">
                         Neturite paskyros?{" "}
                         <button
                             onClick={onSwitchToRegister}
-                            className="text-primary hover:text-primary/80 font-medium transition-colors"
+                            className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
                         >
                             Registruotis
                         </button>

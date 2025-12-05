@@ -20,32 +20,32 @@ const Achievements = ({ achievements }: AchievementsProps) => {
   const totalCount = achievements.length;
 
   return (
-    <div className="glass rounded-xl sm:rounded-2xl p-4 sm:p-6 animate-fade-in">
-      <div className="flex items-center justify-between mb-4 sm:mb-5">
-        <div className="flex items-center gap-2 sm:gap-3">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl gradient-indigo-purple flex items-center justify-center shadow-lg shadow-purple-500/30">
-            <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+    <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center">
+            <Trophy className="w-5 h-5 text-purple-600" />
           </div>
           <div>
-            <h3 className="text-sm sm:text-base font-semibold text-foreground">Pasiekimai</h3>
-            <p className="text-[10px] sm:text-xs text-muted-foreground">
+            <h3 className="text-base font-semibold text-gray-900 tracking-tight">Pasiekimai</h3>
+            <p className="text-xs text-gray-500 font-medium">
               {unlockedCount} / {totalCount} atrakinta
             </p>
           </div>
         </div>
         <div className="text-right">
-          <p className="text-lg sm:text-xl font-bold text-foreground">
+          <p className="text-xl font-bold text-gray-900 tracking-tight">
             {Math.round((unlockedCount / totalCount) * 100)}%
           </p>
-          <p className="text-[10px] sm:text-xs text-muted-foreground">Užbaigta</p>
+          <p className="text-xs text-gray-500 font-medium">Užbaigta</p>
         </div>
       </div>
 
       {/* Progress Bar */}
-      <div className="mb-4 sm:mb-5">
-        <div className="h-2 bg-secondary rounded-full overflow-hidden">
+      <div className="mb-6">
+        <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
           <div
-            className="h-full gradient-indigo-purple rounded-full transition-all duration-500"
+            className="h-full bg-purple-600 rounded-full transition-all duration-500 ease-out"
             style={{ width: `${(unlockedCount / totalCount) * 100}%` }}
           />
         </div>
@@ -62,11 +62,10 @@ const Achievements = ({ achievements }: AchievementsProps) => {
           return (
             <div
               key={achievement.id}
-              className={`relative p-3 sm:p-4 rounded-lg sm:rounded-xl border transition-all ${
-                achievement.unlocked
+              className={`relative p-3 sm:p-4 rounded-lg sm:rounded-xl border transition-all ${achievement.unlocked
                   ? `${achievement.gradient} border-transparent shadow-lg`
                   : "bg-secondary/30 border-white/10 opacity-60"
-              } group hover:scale-105 cursor-pointer`}
+                } group hover:scale-105 cursor-pointer`}
             >
               {/* Unlocked badge */}
               {achievement.unlocked && (
@@ -77,23 +76,20 @@ const Achievements = ({ achievements }: AchievementsProps) => {
 
               <div className="flex flex-col items-center text-center gap-2">
                 <div
-                  className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center ${
-                    achievement.unlocked
+                  className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center ${achievement.unlocked
                       ? "bg-white/20"
                       : "bg-secondary/50"
-                  }`}
+                    }`}
                 >
                   <Icon
-                    className={`w-5 h-5 sm:w-6 sm:h-6 ${
-                      achievement.unlocked ? "text-white" : "text-muted-foreground"
-                    }`}
+                    className={`w-5 h-5 sm:w-6 sm:h-6 ${achievement.unlocked ? "text-white" : "text-muted-foreground"
+                      }`}
                   />
                 </div>
                 <div className="space-y-1">
                   <p
-                    className={`text-[10px] sm:text-xs font-semibold line-clamp-1 ${
-                      achievement.unlocked ? "text-white" : "text-foreground"
-                    }`}
+                    className={`text-[10px] sm:text-xs font-semibold line-clamp-1 ${achievement.unlocked ? "text-white" : "text-foreground"
+                      }`}
                   >
                     {achievement.title}
                   </p>

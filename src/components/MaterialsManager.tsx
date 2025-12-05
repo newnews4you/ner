@@ -76,10 +76,10 @@ const MaterialsManager = ({ subjects = [], initialSubject, initialTopic }: Mater
     return (
         <div className="h-full flex flex-col animate-fade-in">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div>
-                    <h2 className="text-2xl font-bold text-foreground">Mokymosi medžiaga</h2>
-                    <p className="text-sm text-muted-foreground">Tvarkykite savo dokumentus ir užrašus</p>
+                    <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Mokymosi medžiaga</h2>
+                    <p className="text-sm text-gray-500 mt-1">Tvarkykite savo dokumentus ir užrašus vienoje vietoje</p>
                 </div>
                 <button
                     onClick={() => {
@@ -98,49 +98,55 @@ const MaterialsManager = ({ subjects = [], initialSubject, initialTopic }: Mater
                         };
                         input.click();
                     }}
-                    className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl gradient-cyan-blue text-white font-medium hover:opacity-90 transition-all shadow-lg"
+                    className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-gray-900 text-white font-medium hover:bg-black transition-all shadow-sm hover:shadow-md active:scale-95"
                 >
-                    <Plus className="w-5 h-5" />
+                    <Plus className="w-4 h-4" />
                     <span>Įkelti failą</span>
                 </button>
             </div>
 
             {/* Search and Filter */}
-            <div className="flex flex-col sm:flex-row gap-3 mb-6">
-                <div className="flex-1 relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+            <div className="flex flex-col sm:flex-row gap-3 mb-8">
+                <div className="flex-1 relative group">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-gray-600 transition-colors" />
                     <input
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Ieškoti medžiagos..."
-                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-secondary/30 border border-white/5 focus:outline-none focus:border-primary/50 text-foreground transition-all"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-white border border-gray-200 focus:outline-none focus:border-gray-300 focus:ring-2 focus:ring-gray-100 text-gray-900 text-sm transition-all shadow-sm"
                     />
                 </div>
                 <div className="flex gap-2">
                     {subjects.length > 0 && (
-                        <select
-                            value={selectedSubject}
-                            onChange={(e) => setSelectedSubject(e.target.value)}
-                            className="px-3 py-2.5 rounded-xl bg-secondary/30 border border-white/5 text-foreground focus:outline-none focus:border-primary/50 text-sm"
-                        >
-                            <option value="all">Visi kursai</option>
-                            {subjects.map(subject => (
-                                <option key={subject.id} value={subject.id.toString()}>
-                                    {subject.name}
-                                </option>
-                            ))}
-                        </select>
+                        <div className="relative">
+                            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                            <select
+                                value={selectedSubject}
+                                onChange={(e) => setSelectedSubject(e.target.value)}
+                                className="pl-9 pr-8 py-2.5 rounded-lg bg-white border border-gray-200 text-gray-700 text-sm focus:outline-none focus:border-gray-300 focus:ring-2 focus:ring-gray-100 shadow-sm appearance-none cursor-pointer hover:bg-gray-50 transition-colors"
+                            >
+                                <option value="all">Visi kursai</option>
+                                {subjects.map(subject => (
+                                    <option key={subject.id} value={subject.id.toString()}>
+                                        {subject.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
                     )}
-                    <select
-                        value={selectedType}
-                        onChange={(e) => setSelectedType(e.target.value)}
-                        className="px-3 py-2.5 rounded-xl bg-secondary/30 border border-white/5 text-foreground focus:outline-none focus:border-primary/50 text-sm"
-                    >
-                        <option value="all">Visi tipai</option>
-                        <option value="files">Failai</option>
-                        <option value="folders">Aplankai</option>
-                    </select>
+                    <div className="relative">
+                        <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                        <select
+                            value={selectedType}
+                            onChange={(e) => setSelectedType(e.target.value)}
+                            className="pl-9 pr-8 py-2.5 rounded-lg bg-white border border-gray-200 text-gray-700 text-sm focus:outline-none focus:border-gray-300 focus:ring-2 focus:ring-gray-100 shadow-sm appearance-none cursor-pointer hover:bg-gray-50 transition-colors"
+                        >
+                            <option value="all">Visi tipai</option>
+                            <option value="files">Failai</option>
+                            <option value="folders">Aplankai</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -149,51 +155,51 @@ const MaterialsManager = ({ subjects = [], initialSubject, initialTopic }: Mater
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
-                className={`border-2 border-dashed rounded-2xl p-8 mb-8 text-center transition-all ${isDragging
-                    ? 'border-primary bg-primary/10 scale-[1.02]'
-                    : 'border-white/10 hover:border-white/20 hover:bg-white/5'
+                className={`border border-dashed rounded-xl p-10 mb-8 text-center transition-all duration-300 ${isDragging
+                    ? 'border-blue-400 bg-blue-50/50 scale-[1.01]'
+                    : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50/50'
                     }`}
             >
-                <div className="w-16 h-16 rounded-full bg-secondary/50 flex items-center justify-center mx-auto mb-4">
-                    <Upload className={`w-8 h-8 ${isDragging ? 'text-primary' : 'text-muted-foreground'}`} />
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4 transition-colors ${isDragging ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500'}`}>
+                    <Upload className="w-6 h-6" />
                 </div>
-                <h3 className="text-lg font-semibold text-foreground mb-1">
+                <h3 className="text-base font-medium text-gray-900 mb-1">
                     {isDragging ? 'Paleiskite failus čia' : 'Tempkite failus čia'}
                 </h3>
-                <p className="text-sm text-muted-foreground">
-                    arba spauskite mygtuką viršuje
+                <p className="text-xs text-gray-500">
+                    Maksimalus failo dydis 10MB
                 </p>
             </div>
 
             {/* Materials List */}
             {isLoading ? (
                 <div className="flex justify-center py-12">
-                    <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                    <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
                 </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {filteredMaterials.map((item) => (
                         <div
                             key={item.id}
-                            className="group p-4 rounded-xl bg-secondary/30 border border-white/5 hover:bg-secondary/50 hover:border-white/10 transition-all cursor-pointer relative"
+                            className="group p-4 rounded-xl bg-white border border-gray-200 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 cursor-pointer relative"
                         >
-                            <div className="flex items-start justify-between mb-3">
-                                <div className={`p-3 rounded-lg ${item.type === 'folder' ? 'bg-blue-500/20 text-blue-400' : 'bg-purple-500/20 text-purple-400'
+                            <div className="flex items-start justify-between mb-4">
+                                <div className={`p-2.5 rounded-lg ${item.type === 'folder' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'
                                     }`}>
-                                    {item.type === 'folder' ? <Folder className="w-6 h-6" /> : <File className="w-6 h-6" />}
+                                    {item.type === 'folder' ? <Folder className="w-5 h-5" /> : <File className="w-5 h-5" />}
                                 </div>
-                                <button className="p-1 rounded-lg hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors">
+                                <button className="p-1.5 rounded-md hover:bg-gray-100 text-gray-400 hover:text-gray-900 transition-colors opacity-0 group-hover:opacity-100">
                                     <MoreVertical className="w-4 h-4" />
                                 </button>
                             </div>
 
-                            <h4 className="font-medium text-foreground mb-1 truncate">{item.name}</h4>
-                            <div className="flex items-center justify-between text-xs text-muted-foreground">
+                            <h4 className="font-medium text-gray-900 text-sm mb-1 truncate">{item.name}</h4>
+                            <div className="flex items-center justify-between text-[11px] text-gray-500 font-medium">
                                 <span>{item.type === 'folder' ? `${item.items} elementai` : item.size}</span>
                                 <span>{item.date}</span>
                             </div>
                             {item.topic && (
-                                <div className="mt-2 text-xs text-primary/80 bg-primary/10 px-2 py-1 rounded-md inline-block">
+                                <div className="mt-3 text-[10px] font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded-md inline-block border border-gray-200">
                                     {item.topic}
                                 </div>
                             )}

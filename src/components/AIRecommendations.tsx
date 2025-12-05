@@ -62,59 +62,55 @@ const AIRecommendations = ({ currentSubject, weakAreas, studyHistory }: AIRecomm
   const getTypeColor = (type: Recommendation["type"]) => {
     switch (type) {
       case "study":
-        return "gradient-cyan-blue";
+        return "bg-blue-100 text-blue-600";
       case "practice":
-        return "gradient-purple-pink";
+        return "bg-purple-100 text-purple-600";
       case "review":
-        return "gradient-green-teal";
+        return "bg-green-100 text-green-600";
       case "focus":
-        return "gradient-orange-red";
+        return "bg-orange-100 text-orange-600";
     }
   };
 
   const getPriorityColor = (priority: Recommendation["priority"]) => {
     switch (priority) {
       case "high":
-        return "text-orange-400";
+        return "text-orange-600 bg-orange-50";
       case "medium":
-        return "text-cyan-400";
+        return "text-blue-600 bg-blue-50";
       case "low":
-        return "text-muted-foreground";
+        return "text-gray-500 bg-gray-100";
     }
   };
 
   return (
-    <div className="glass rounded-xl sm:rounded-2xl p-4 sm:p-6 border-2 border-primary/20 relative overflow-hidden animate-fade-in">
-      {/* Background effects */}
-      <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-accent/5" />
-      <div className="absolute -right-10 -top-10 w-32 h-32 rounded-full bg-primary/10 blur-3xl" />
-
+    <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden">
       <div className="relative z-10">
         {/* Header */}
-        <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-5">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl gradient-purple-pink flex items-center justify-center shadow-lg shadow-primary/30">
-            <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-white animate-pulse" />
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center">
+            <Sparkles className="w-5 h-5 text-purple-600" />
           </div>
           <div className="flex-1">
-            <h3 className="text-sm sm:text-base font-semibold text-foreground flex items-center gap-2">
+            <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2 tracking-tight">
               AI Rekomendacijos
-              <span className="text-xs px-2 py-0.5 rounded-full bg-primary/20 text-primary">
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-50 text-purple-600 font-medium border border-purple-100">
                 Personalizuota
               </span>
             </h3>
-            <p className="text-[10px] sm:text-xs text-muted-foreground">
+            <p className="text-xs text-gray-500 font-medium">
               Remiantis jūsų mokymosi duomenimis
             </p>
           </div>
         </div>
 
         {/* Filter Tabs */}
-        <div className="flex flex-wrap gap-2 mb-4">
+        <div className="flex flex-wrap gap-2 mb-6">
           <button
             onClick={() => setSelectedType("all")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${selectedType === "all"
-                ? "gradient-purple-pink text-white"
-                : "bg-secondary/50 text-foreground hover:bg-secondary/70"
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${selectedType === "all"
+              ? "bg-gray-900 text-white shadow-sm"
+              : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
               }`}
           >
             Visi ({recommendations.length})
@@ -126,9 +122,9 @@ const AIRecommendations = ({ currentSubject, weakAreas, studyHistory }: AIRecomm
               <button
                 key={type}
                 onClick={() => setSelectedType(type)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5 ${selectedType === type
-                    ? "gradient-purple-pink text-white"
-                    : "bg-secondary/50 text-foreground hover:bg-secondary/70"
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1.5 ${selectedType === type
+                  ? "bg-gray-900 text-white shadow-sm"
+                  : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                   }`}
               >
                 {getTypeIcon(type)}
@@ -143,20 +139,20 @@ const AIRecommendations = ({ currentSubject, weakAreas, studyHistory }: AIRecomm
         {/* Recommendations List */}
         <div className="space-y-3">
           {isLoading ? (
-            <div className="text-center py-8">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-secondary/50 flex items-center justify-center animate-pulse">
-                <Sparkles className="w-8 h-8 text-primary" />
+            <div className="text-center py-12">
+              <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-gray-50 flex items-center justify-center animate-pulse">
+                <Sparkles className="w-6 h-6 text-gray-400" />
               </div>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-gray-500 font-medium">
                 Generuojamos rekomendacijos...
               </p>
             </div>
           ) : filtered.length === 0 ? (
-            <div className="text-center py-8">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-secondary/50 flex items-center justify-center">
-                <Sparkles className="w-8 h-8 text-muted-foreground" />
+            <div className="text-center py-12">
+              <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-gray-50 flex items-center justify-center">
+                <Sparkles className="w-6 h-6 text-gray-400" />
               </div>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-gray-500 font-medium">
                 Nėra rekomendacijų šiam filtrui
               </p>
             </div>
@@ -164,46 +160,40 @@ const AIRecommendations = ({ currentSubject, weakAreas, studyHistory }: AIRecomm
             filtered.map((rec) => (
               <div
                 key={rec.id}
-                className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border transition-all hover:scale-[1.02] cursor-pointer ${rec.priority === "high"
-                    ? "bg-secondary/50 border-orange-500/30"
-                    : "bg-secondary/30 border-white/10"
-                  }`}
+                className={`p-4 rounded-xl border transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 cursor-pointer bg-white border-gray-200 group`}
               >
-                <div className="flex items-start gap-3">
-                  <div className={`w-10 h-10 rounded-xl ${getTypeColor(rec.type)} flex items-center justify-center shrink-0 shadow-lg`}>
+                <div className="flex items-start gap-4">
+                  <div className={`w-10 h-10 rounded-lg ${getTypeColor(rec.type)} flex items-center justify-center shrink-0`}>
                     {getTypeIcon(rec.type)}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2 mb-1">
-                      <h4 className="text-sm font-semibold text-foreground line-clamp-1">
+                      <h4 className="text-sm font-semibold text-gray-900 line-clamp-1 group-hover:text-blue-600 transition-colors">
                         {rec.title}
                       </h4>
-                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full shrink-0 ${rec.priority === "high" ? "bg-orange-500/20 text-orange-400" :
-                          rec.priority === "medium" ? "bg-cyan-500/20 text-cyan-400" :
-                            "bg-secondary text-muted-foreground"
-                        }`}>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full shrink-0 font-medium ${getPriorityColor(rec.priority)}`}>
                         {rec.priority === "high" ? "Aukštas" :
                           rec.priority === "medium" ? "Vidutinis" : "Žemas"}
                       </span>
                     </div>
-                    <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
+                    <p className="text-xs text-gray-500 mb-3 line-clamp-2 leading-relaxed">
                       {rec.description}
                     </p>
-                    <div className="flex items-center gap-4 text-[10px] sm:text-xs text-muted-foreground mb-2">
-                      <span className="flex items-center gap-1">
-                        <BookOpen className="w-3 h-3" />
+                    <div className="flex items-center gap-4 text-[11px] text-gray-500 mb-3 font-medium">
+                      <span className="flex items-center gap-1.5">
+                        <BookOpen className="w-3.5 h-3.5" />
                         {rec.subject}
                       </span>
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
+                      <span className="flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5" />
                         {rec.estimatedTime}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <p className="text-[10px] text-primary italic">
+                    <div className="flex items-center justify-between pt-3 border-t border-gray-50">
+                      <p className="text-[10px] text-purple-600 italic font-medium">
                         💡 {rec.reason}
                       </p>
-                      <button className="px-3 py-1.5 rounded-lg bg-secondary/50 hover:bg-secondary/70 text-xs text-foreground transition-colors flex items-center gap-1">
+                      <button className="px-3 py-1.5 rounded-md bg-gray-900 text-white hover:bg-black text-[10px] font-medium transition-all flex items-center gap-1.5 shadow-sm hover:shadow-md active:scale-95">
                         Pradėti
                         <ArrowRight className="w-3 h-3" />
                       </button>
@@ -220,4 +210,3 @@ const AIRecommendations = ({ currentSubject, weakAreas, studyHistory }: AIRecomm
 };
 
 export default AIRecommendations;
-

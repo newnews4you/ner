@@ -8,6 +8,9 @@ import { useEffect } from "react";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
+import Search from "./pages/Search";
+import AllCourses from "./pages/AllCourses";
+import Planner from "./pages/Planner";
 
 const queryClient = new QueryClient();
 
@@ -73,6 +76,9 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/search" element={<Search />} />
+            <Route path="/all-courses" element={<AllCourses />} />
+            <Route path="/planner" element={<Planner />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

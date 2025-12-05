@@ -58,7 +58,7 @@ const StudyTimer = ({
     if (mode === "work") {
       const newSessions = sessionsCompleted + 1;
       setSessionsCompleted(newSessions);
-      
+
       // Save study session
       const sessions = JSON.parse(localStorage.getItem("studySessions") || "[]");
       const today = new Date().toISOString().split('T')[0];
@@ -68,12 +68,12 @@ const StudyTimer = ({
         subject: currentSubject,
       });
       localStorage.setItem("studySessions", JSON.stringify(sessions));
-      
+
       // Trigger study complete callback
       if (onStudyComplete) {
         onStudyComplete();
       }
-      
+
       // Show notification
       if (onNotification) {
         onNotification(
@@ -84,7 +84,7 @@ const StudyTimer = ({
           )
         );
       }
-      
+
       // Auto start break after work session
       const nextMode = newSessions > 0 && newSessions % 3 === 0 ? "longBreak" : "break";
       setMode(nextMode);
@@ -105,14 +105,14 @@ const StudyTimer = ({
       setMode("work");
       setTimeLeft(workDuration * 60);
     }
-    
+
     // Browser notification
     if ("Notification" in window && Notification.permission === "granted") {
       new Notification(
         mode === "work" ? "Mokymosi sesija baigta!" : "Pertrauka baigta",
         {
-          body: mode === "work" 
-            ? "Puikiai! Laikas pertraukai!" 
+          body: mode === "work"
+            ? "Puikiai! Laikas pertraukai!"
             : "Laikas grįžti prie mokymosi!",
           icon: "/favicon.ico",
         }
@@ -138,8 +138,8 @@ const StudyTimer = ({
       mode === "work"
         ? workDuration * 60
         : mode === "longBreak"
-        ? longBreakDuration * 60
-        : shortBreakDuration * 60
+          ? longBreakDuration * 60
+          : shortBreakDuration * 60
     );
   };
 
@@ -161,18 +161,18 @@ const StudyTimer = ({
   };
 
   const progress = (() => {
-    const total = mode === "work" 
-      ? workDuration * 60 
-      : mode === "longBreak" 
-      ? longBreakDuration * 60 
-      : shortBreakDuration * 60;
+    const total = mode === "work"
+      ? workDuration * 60
+      : mode === "longBreak"
+        ? longBreakDuration * 60
+        : shortBreakDuration * 60;
     return ((total - timeLeft) / total) * 100;
   })();
 
   const getModeColor = () => {
-    if (mode === "work") return "gradient-purple-pink";
-    if (mode === "longBreak") return "gradient-green-teal";
-    return "gradient-cyan-blue";
+    if (mode === "work") return "bg-blue-100 text-blue-600";
+    if (mode === "longBreak") return "bg-green-100 text-green-600";
+    return "bg-cyan-100 text-cyan-600";
   };
 
   const getModeLabel = () => {
@@ -182,25 +182,23 @@ const StudyTimer = ({
   };
 
   return (
-    <div className="glass rounded-xl sm:rounded-2xl p-4 sm:p-6 border-2 border-primary/20 relative overflow-hidden animate-fade-in">
-      {/* Background effects */}
-      <div className={`absolute inset-0 ${getModeColor()} opacity-5`} />
-      <div className="absolute -right-10 -top-10 w-32 h-32 rounded-full bg-primary/10 blur-3xl" />
-      
+    <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm transition-all hover:shadow-md">
       <div className="relative z-10">
         {/* Header */}
-        <div className="flex items-center justify-between mb-4 sm:mb-6">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl ${getModeColor()} flex items-center justify-center shadow-lg`}>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${mode === "work" ? "bg-gray-100 text-gray-900" :
+                mode === "longBreak" ? "bg-green-50 text-green-700" : "bg-orange-50 text-orange-700"
+              }`}>
               {mode === "work" ? (
-                <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                <Clock className="w-4 h-4" />
               ) : (
-                <Coffee className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                <Coffee className="w-4 h-4" />
               )}
             </div>
             <div>
-              <h3 className="text-sm sm:text-base font-semibold text-foreground">{getModeLabel()}</h3>
-              <p className="text-[10px] sm:text-xs text-muted-foreground">
+              <h3 className="text-sm font-semibold text-gray-900 tracking-tight">{getModeLabel()}</h3>
+              <p className="text-[10px] text-gray-500 font-medium">
                 {sessionsCompleted} {sessionsCompleted === 1 ? "sesija" : "sesijos"} užbaigta
               </p>
             </div>
@@ -208,8 +206,8 @@ const StudyTimer = ({
         </div>
 
         {/* Timer Display */}
-        <div className="flex flex-col items-center mb-4 sm:mb-6">
-          <div className="relative w-48 h-48 sm:w-56 sm:h-56 mb-4">
+        <div className="flex flex-col items-center mb-4">
+          <div className="relative w-48 h-48 mb-4 group">
             {/* Progress Circle */}
             <svg className="w-full h-full transform -rotate-90">
               <circle
@@ -217,71 +215,67 @@ const StudyTimer = ({
                 cy="50%"
                 r="45%"
                 fill="none"
-                stroke="hsl(var(--secondary))"
-                strokeWidth="8"
+                stroke="#f3f4f6"
+                strokeWidth="4"
               />
               <circle
                 cx="50%"
                 cy="50%"
                 r="45%"
                 fill="none"
-                stroke="url(#timerGradient)"
-                strokeWidth="8"
+                stroke={mode === "work" ? "#111827" : mode === "longBreak" ? "#15803d" : "#c2410c"}
+                strokeWidth="4"
                 strokeLinecap="round"
                 strokeDasharray={`${progress * 2.83} 283`}
-                className="transition-all duration-1000"
+                className="transition-all duration-1000 ease-in-out"
               />
-              <defs>
-                <linearGradient id="timerGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="hsl(262, 83%, 58%)" />
-                  <stop offset="100%" stopColor="hsl(330, 81%, 60%)" />
-                </linearGradient>
-              </defs>
             </svg>
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center">
-                <p className="text-4xl sm:text-5xl font-bold text-foreground mb-1">
+                <p className="text-4xl font-bold text-gray-900 mb-1 tracking-tighter font-mono">
                   {formatTime(timeLeft)}
                 </p>
-                <p className="text-xs sm:text-sm text-muted-foreground">
-                  {mode === "work" ? "Fokusavimosi laikas" : "Pailsėkite"}
+                <p className="text-xs text-gray-500 font-medium uppercase tracking-widest">
+                  {mode === "work" ? "Fokusas" : "Pertrauka"}
                 </p>
               </div>
             </div>
           </div>
 
           {/* Controls */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-2 w-full max-w-xs">
             {!isRunning ? (
               <button
                 onClick={startTimer}
-                className={`${getModeColor()} px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl text-white font-medium flex items-center gap-2 hover:opacity-90 transition-all shadow-lg hover:scale-105`}
+                className="flex-1 bg-gray-900 hover:bg-black text-white h-10 rounded-lg font-medium flex items-center justify-center gap-2 transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-95 text-sm"
               >
-                <Play className="w-4 h-4 sm:w-5 sm:h-5" />
+                <Play className="w-3.5 h-3.5 fill-current" />
                 Pradėti
               </button>
             ) : (
               <button
                 onClick={pauseTimer}
-                className="px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl bg-secondary/80 text-foreground font-medium flex items-center gap-2 hover:bg-secondary transition-all border border-white/10 hover:scale-105"
+                className="flex-1 bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 h-10 rounded-lg font-medium flex items-center justify-center gap-2 transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-95 text-sm"
               >
-                <Pause className="w-4 h-4 sm:w-5 sm:h-5" />
+                <Pause className="w-3.5 h-3.5 fill-current" />
                 Pristabdyti
               </button>
             )}
-            
+
             <button
               onClick={resetTimer}
-              className="px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-secondary/50 text-foreground hover:bg-secondary/70 transition-all border border-white/10 flex items-center gap-2"
+              className="w-10 h-10 rounded-lg bg-white text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-all border border-gray-200 shadow-sm hover:shadow-md flex items-center justify-center"
+              title="Perkrauti"
             >
               <RotateCcw className="w-4 h-4" />
             </button>
 
             <button
               onClick={skipSession}
-              className="px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-secondary/50 text-foreground hover:bg-secondary/70 transition-all border border-white/10 flex items-center gap-2"
+              className="w-10 h-10 rounded-lg bg-white text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-all border border-gray-200 shadow-sm hover:shadow-md flex items-center justify-center"
+              title="Praleisti"
             >
-              <Square className="w-4 h-4" />
+              <Square className="w-4 h-4 fill-current" />
             </button>
           </div>
         </div>
